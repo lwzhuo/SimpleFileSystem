@@ -1,3 +1,11 @@
+project/fs
+project/out
+project/mydisk
+test/*
+!test/*.c
+!test/*.h
+.vscode
+
 # Prerequisites
 *.d
 
