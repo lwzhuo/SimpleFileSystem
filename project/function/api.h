@@ -1,5 +1,7 @@
 void startsys();
 void format();
+void createDisk();
+void showBlock0();
 void my_cd(char *dirname);
 void my_mkdir(char *dirname);
 void my_rmdir(char *dirname);
@@ -12,4 +14,4 @@ int my_write(int fd);
 int do_write(int fd,char *text,int len,char wstyle);
 int my_read(int fd,int len);
 int do_read(int fd,int len,char *text);
-void my_exitsys();
+void exitsys();
