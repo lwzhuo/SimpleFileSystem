@@ -14,25 +14,29 @@ typedef struct list_head{
 
 /*  list_for_each(pos, head)遍历链表
 **  pos - 临时变量(list_head *类型) head - 链表头指针(list_head *类型)*/
-#define list_for_each(pos, head) \
-	for (pos = (head)->next; pos != (head); pos = pos->next)
+#define list_for_each(pos, headptr) \
+	for (pos = (headptr)->next; pos != (headptr); pos = pos->next)
+
+/*  list_for_each_reverse(pos, head)反向遍历链表
+**  pos - 临时变量(list_head *类型) head - 链表头指针(list_head *类型)*/
+#define list_for_each_reverse(pos, headptr) \
+	for (pos = (headptr)->prev; pos != (headptr); pos = pos->prev)
 
 /*  get_node(TYPE)初始化一个结点
 **  TYPE - 数据类型*/
 #define get_node(TYPE) (TYPE *)malloc(sizeof(TYPE));
 
 /*  list_init(HEAD)初始化一个链表"头"
-**  HEAD - 链表头指针(list_head *类型)*/
+**  HEAD - 链表头(list_head 类型)*/
 #define list_init(HEAD) \
     HEAD.next = &(HEAD); HEAD.prev = &(HEAD)
 
-/*  list_insert(HEAD,NODE)插入结点
-**  HEAD - 链表头指针(list_head *类型) NODE - 新的结构*/
-#define list_insert(HEAD,NODE) \
-    NODE->head.next = &(HEAD); \
-    NODE->head.prev = HEAD.prev; \
-    HEAD.prev->next = &(NODE->head); \
-    HEAD.prev = &(NODE->head)
-    
+/*  list_insert(HEAD,list_head_for_NODE)在head之前插入结点
+**  HEAD - 链表头(list_head 类型) list_head_for_NODE - 新的结构的链表头*/
+#define list_insert(HEAD,list_head_for_NODE) \
+    list_head_for_NODE.next = &(HEAD); \
+    list_head_for_NODE.prev = HEAD.prev; \
+    HEAD.prev->next = &(list_head_for_NODE); \
+    HEAD.prev = &(list_head_for_NODE)
 
 
