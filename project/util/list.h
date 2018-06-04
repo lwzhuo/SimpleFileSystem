@@ -39,4 +39,16 @@ typedef struct list_head{
     HEAD.prev->next = &(list_head_for_NODE); \
     HEAD.prev = &(list_head_for_NODE)
 
+// /*  list_delete(list_head_for_NODE,TYPE,MEMBR)删除NODE所在结构
+// **  list_head_for_NODE - NODE所含链表头(list_head 类型) TYPE - 数据类型 MEMBR - 结构成员名*/
+// #define list_delete(list_head_for_NODE,TYPE,MEMBER) \
+//     (list_head_for_NODE).prev->next = (list_head_for_NODE).next; \
+//     (list_head_for_NODE).next->prev = (list_head_for_NODE).prev; \
+//     printf("%ld \n",list_entry(&(list_head_for_NODE),TYPE,MEMBER));\
+//     printf("%ld\n",list_entry(lhead->next,struct mystruct,head));
+//     // free(list_entry(lhead->next,struct mystruct,head))
 
+#define list_delete(struct_ptr,HEAD_MEMBERNAME) \
+    struct_ptr->HEAD_MEMBERNAME.prev->next = struct_ptr->HEAD_MEMBERNAME.next; \
+    struct_ptr->HEAD_MEMBERNAME.next->prev = struct_ptr->HEAD_MEMBERNAME.prev; \
+    free(struct_ptr)
