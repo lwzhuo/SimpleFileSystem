@@ -32,7 +32,8 @@ typedef struct link{
 #define get_node(TYPE) (TYPE *)malloc(sizeof(TYPE));
 
 /*  list_delete(linkptr,structptr)删除一个结点
-**  linkptr - 结点的link成员指针 structptr - 结点的结构体指针*/
+**  linkptr - 结点的link成员指针 structptr - 结点的结构体指针
+**  注意:删除表头的行为要多加小心*/
 #define list_delete(linkptr,structptr) \
     list_unlink(linkptr); \
     free(structptr); \
@@ -67,6 +68,19 @@ void list_unlink(link * nodeptr){
         nodeptr->next->prev = nodeptr->prev;
         nodeptr->prev->next = nodeptr->next;
     }
+    return;
+}
+
+/*  list_destroy(link * headptr)销毁整个链表
+**  headptr - 结点的link成员指针(作为头节点)*/
+void list_destroy(link * headptr){
+    link * temp=headptr->next,*next;
+    while(temp!=headptr){
+        next = temp->next;
+        free(temp->sptr);
+        temp = next;
+    }
+    free(headptr->sptr);
     return;
 }
 
