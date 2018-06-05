@@ -4,6 +4,7 @@
 //以下是其结构
 typedef struct link link;
 typedef struct link{
+    void * sptr;
     link *next;
     link *prev;
 }link;
@@ -34,19 +35,24 @@ typedef struct link{
 **  linkptr - 结点的link成员指针 structptr - 结点的结构体指针*/
 #define list_delete(linkptr,structptr) \
     list_unlink(linkptr); \
-    free(structptr)
+    free(structptr); \
+    structptr = NULL
 
 /*  list_init(link *headptr)初始化一个链表
-**  headptr - 结点的link成员指针*/
-int list_init(link *headptr){
+**  headptr - 结点的link成员指针 structptr - 结点的首地址*/
+int list_init(link *headptr,void *structptr){
     headptr->next = headptr;
     headptr->prev = headptr;
+    headptr->sptr = structptr;
     return 0;
 }
 
 /*  list_insert(link * headptr,link * nodeptr)在headptr所在节点前插入一个结点
-**  headptr - 结点的link成员指针(作为头节点) nodeptr - 结点的link成员指针(作为插入的新节点)*/
-int list_insert(link * headptr,link * nodeptr){
+**  headptr - 结点的link成员指针(作为头节点) 
+**  nodeptr - 结点的link成员指针(作为插入的新节点)
+**  structptr - 结点的首地址*/
+int list_insert(link * headptr,link * nodeptr,void *structptr){
+    nodeptr->sptr = structptr;
     nodeptr->next = headptr;
     nodeptr->prev = headptr->prev;
     headptr->prev->next = nodeptr;
@@ -57,7 +63,10 @@ int list_insert(link * headptr,link * nodeptr){
 /*  list_unlink(link * nodeptr)将当前结点从链表中分离
 **  nodeptr - 结点的link成员指针*/
 void list_unlink(link * nodeptr){
-    nodeptr->next->prev = nodeptr->prev;
-    nodeptr->prev->next = nodeptr->next;
+    if(nodeptr->next!=nodeptr){//判断是否只剩下一个结点
+        nodeptr->next->prev = nodeptr->prev;
+        nodeptr->prev->next = nodeptr->next;
+    }
+    return;
 }
 
