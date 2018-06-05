@@ -1,6 +1,7 @@
 #include<stdlib.h>
 #include"../global/define.h"
-
+//某类结构包含list_head结构，即可有条件形成一个链表。
+//以下是其结构
 typedef struct list_head list_head;
 typedef struct list_head{
     list_head *next;
@@ -29,9 +30,9 @@ typedef struct list_head{
 **  TYPE - 数据类型*/
 #define get_node(TYPE) (TYPE *)malloc(sizeof(TYPE));
 
-#define list_delete(nodeptr,TYPE,MEMBER) \
+#define list_delete(nodeptr,structptr) \
     list_unlink(nodeptr); \
-    free(list_entry(nodeptr,TYPE,MEMBER))
+    free(structptr)
 
 int list_init(list_head *headptr){
     headptr->next = headptr;
