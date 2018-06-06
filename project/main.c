@@ -1,6 +1,9 @@
 #include<stdio.h>
 #include"function/api.h"
-#include"util/disk.h"
+#include"./global/var.h"
+char sysname[100]="mydisk";
+FILE * DISK;
+BLOCK0 block0;
 int main()
 {
     startsys();

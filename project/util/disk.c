@@ -1,6 +1,6 @@
 #include<stdio.h>
+#include"disk.h"
 #include"../global/global.h"
-#include"../util/disk.h"
 void createDisk(){
     char buff[BLOCK_SIZE]={'0'};
     FILE *f = fopen(sysname,"r+");
@@ -26,3 +26,7 @@ int readFromDisk(FILE* DISK,void *buff,int size,int base,long offset){
     fread(buff,size,1,DISK);
     return 0;
 }
+// int getFAT(FILE * DISK,FATitem * fatarray){
+//     readFromDisk(DISK,fatarray,BLOCK_SIZE*2,BLOCK_SIZE*1,0);
+//     return 0;
+// }
