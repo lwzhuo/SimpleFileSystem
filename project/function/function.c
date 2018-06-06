@@ -58,21 +58,19 @@ void format(){//文件系统格式化
 
     fseek(DISK,0,SEEK_SET);
     fwrite(&block0,sizeof(BLOCK0),1,DISK);
-//两个FAT块
-    int *fat;
-    fat = (int *)malloc(sizeof(int)*BLOCK_NUMS);
-    memset(fat,0,sizeof(int));
+//两个FAT块 每个占2个磁盘块 每个FAT表项2B大小
+    FATitem *fat,item;
+    fat = (FATitem *)malloc(sizeof(FATitem)*BLOCK_NUMS*2);
+    memset(fat,0,sizeof(FATitem));
     fseek(DISK,1*BLOCK_SIZE,SEEK_SET);
-    fwrite(fat,sizeof(int),BLOCK_NUMS,DISK);
-    fseek(DISK,2*BLOCK_SIZE,SEEK_SET);
-    fwrite(fat,sizeof(int),BLOCK_NUMS,DISK);
+    fwrite(fat,sizeof(FATitem),BLOCK_NUMS*2,DISK);
     free(fat);
-//根目录区 存放在第4个盘块起始位
+//根目录区 存放在第6个盘块起始位
     DirItem_disk dd;
-    dd.inode = BLOCK_SIZE*4+FCB_SIZE*0;
+    dd.inode = BLOCK_SIZE*5+FCB_SIZE*0;//FCB位置
     strcpy(dd.name,".");
-    writeToDisk(DISK,&dd,sizeof(DirItem_disk),BLOCK_SIZE*3,0);
-//根目录FCB 存放在第5个盘块起始位
+    writeToDisk(DISK,&dd,sizeof(DirItem_disk),BLOCK_SIZE*5,0);
+//根目录FCB 存放在第7个盘块起始位
     FCB rootFCB;
     rootFCB.type = 1;
     rootFCB.full = 0;
@@ -80,9 +78,16 @@ void format(){//文件系统格式化
     rootFCB.moditime = 0;
     rootFCB.base = 4;
     rootFCB.length = 1;
-    writeToDisk(DISK,&rootFCB,sizeof(rootFCB),BLOCK_SIZE*4,0);
+    writeToDisk(DISK,&rootFCB,sizeof(rootFCB),BLOCK_SIZE*6,0);
 //修改对应FAT表
-    
+    item.item = -1;
+    for(int i=0;i<=5;i++){
+        writeToDisk(DISK,&item,sizeof(FATitem),BLOCK_SIZE*1,i);
+        writeToDisk(DISK,&item,sizeof(FATitem),BLOCK_SIZE*3,i);
+    }
+    item.item = 1;
+    writeToDisk(DISK,&item,sizeof(FATitem),BLOCK_SIZE*1,6);
+    writeToDisk(DISK,&item,sizeof(FATitem),BLOCK_SIZE*3,6);
 }
 
 void showBlock0(){

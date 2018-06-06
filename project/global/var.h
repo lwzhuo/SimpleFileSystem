@@ -2,8 +2,8 @@
 #include"define.h"
 #include"../util/list.h"
 typedef int Status;
-char sysname[100]="mydisk";
-FILE * DISK;
+typedef unsigned char byte;
+
 typedef struct BLOCK0{
     char identify[10];
     char info[200];
@@ -35,5 +35,11 @@ typedef struct DirItem{
     lslink itemlink;
 }DirItem;
 
+typedef struct FATitem{//FAT表项 2B
+    int item:16;
+}FATitem;
+
+char sysname[100]="mydisk";
+FILE * DISK;
 BLOCK0 block0;
 

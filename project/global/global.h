@@ -2,8 +2,6 @@
 #ifndef __GLOBAL__
     #define __GLOBAL__
     #include"define.h"
-    typedef int Status;
-    typedef unsigned char Byte;
     typedef struct BLOCK0{
         char identify[10];
         char info[200];
