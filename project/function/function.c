@@ -5,14 +5,9 @@
 #include<string.h>
 #include<sys/stat.h>
 #include<unistd.h>
-#include"../global/var.h"
-#include"../global/define.h"
 #include"./api.h"
-
-extern FILE * DISK;
-extern char sysname[100];
-extern BLOCK0 block0;
-
+#include"../global/var.h"
+#include"../util/disk.h"
 void startsys(){//初始化文件系统
     int fd;
     int hasDisk = 1;
@@ -52,13 +47,6 @@ void startsys(){//初始化文件系统
     }         
 }
 
-void createDisk(){
-    char buff[BLOCK_SIZE]={'0'};
-    FILE *f = fopen(sysname,"a+");
-    for(int i=0;i<BLOCK_NUMS;i++)
-        fwrite(buff,sizeof(buff),1,f);
-    fclose(f);
-}
 
 void format(){//文件系统格式化
 //引导块

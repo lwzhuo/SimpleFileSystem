@@ -1,11 +1,8 @@
 #include<stdio.h>
-#include<string.h>
 #include"function/api.h"
-
+#include"util/disk.h"
 int main()
 {
-    extern char sysname[100];
-    strcpy(sysname,"mydisk");
     startsys();
     showBlock0();
     exitsys();
