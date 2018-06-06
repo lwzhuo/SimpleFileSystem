@@ -101,6 +101,17 @@ void showFAT(){
         printf("item %d:%d\n",i,fi[i].item);
 }
 
+void showFCB(int blocknum,int num_in_block){
+    FCB fcb;
+    readFromDisk(DISK,&fcb,sizeof(fcb),blocknum*BLOCK_SIZE,num_in_block*FCB_SIZE);
+    printf("type %d\nfull %d\ncreate time %d\n\
+modify time %d\nblocknum %d\nlength %d\n",
+fcb.type,fcb.full,fcb.creatime,fcb.moditime,fcb.base,fcb.length);
+}
+
+void my_mkdir(char *dirname){
+
+}
 void exitsys(){//退出文件系统
     fclose(DISK);
 }
