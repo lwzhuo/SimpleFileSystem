@@ -17,7 +17,7 @@ void format(){//文件系统格式化
     fseek(DISK,0,SEEK_SET);
     fwrite(&block0,sizeof(BLOCK0),1,DISK);
 //两个FAT块 每个占2个磁盘块 每个FAT表项2B大小
-    FATitem *fat,item;
+    FATitem *fat,fi;
     fat = (FATitem *)malloc(sizeof(FATitem)*BLOCK_NUMS*2);
     memset(fat,0,sizeof(FATitem));
     fseek(DISK,1*BLOCK_SIZE,SEEK_SET);
@@ -38,14 +38,14 @@ void format(){//文件系统格式化
     rootFCB.length = 1;
     writeToDisk(DISK,&rootFCB,sizeof(rootFCB),BLOCK_SIZE*6,0);
 //修改对应FAT表
-    item.item = -1;
-    for(int i=0;i<=5;i++){
-        writeToDisk(DISK,&item,sizeof(FATitem),BLOCK_SIZE*1,i);
-        writeToDisk(DISK,&item,sizeof(FATitem),BLOCK_SIZE*3,i);
+    fi.item = -1;
+    for(int i=0;i<=6;i++){
+        writeToDisk(DISK,&fi,sizeof(FATitem),FAT1_BLOCK_LOCATON,i*FAT_ITEM_SIZE);
+        writeToDisk(DISK,&fi,sizeof(FATitem),FAT2_BLOCK_LOCATON,i*FAT_ITEM_SIZE);
     }
-    item.item = 1;
-    writeToDisk(DISK,&item,sizeof(FATitem),BLOCK_SIZE*1,6);
-    writeToDisk(DISK,&item,sizeof(FATitem),BLOCK_SIZE*3,6);
+    fi.item = 1;
+    writeToDisk(DISK,&fi,sizeof(FATitem),FAT1_BLOCK_LOCATON,6*FAT_ITEM_SIZE);
+    writeToDisk(DISK,&fi,sizeof(FATitem),FAT2_BLOCK_LOCATON,6*FAT_ITEM_SIZE);
 }
 
 void startsys(){//初始化文件系统
@@ -92,6 +92,13 @@ void showBlock0(){
     fseek(DISK,0,SEEK_SET);
     fread(&b0,sizeof(BLOCK0),1,DISK);
     printf("identify:%s\ninfo:%s\nrootblock:%d\ndatablock:%d\n",b0.identify,b0.info,b0.root,b0.startblock);
+}
+
+void showFAT(){
+    FATitem *fi = malloc(sizeof(FATitem)*FAT_ITEM_NUM);
+    getFAT(DISK,fi);
+    for(int i=0;i<FAT_ITEM_NUM;i++)
+        printf("item %d:%d\n",i,fi[i].item);
 }
 
 void exitsys(){//退出文件系统

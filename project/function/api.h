@@ -3,6 +3,7 @@
     void startsys();
     void format();
     void showBlock0();
+    void showFAT();
     void my_cd(char *dirname);
     void my_mkdir(char *dirname);
     void my_rmdir(char *dirname);

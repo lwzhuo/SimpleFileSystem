@@ -42,9 +42,8 @@ typedef struct DirItem{
     lslink itemlink;
 }DirItem;
 
-typedef struct FATitem{//FAT表项 2B
-    int item:16;
+typedef struct FATitem{//FAT表项 2B -32767-32768
+    signed short item:16;
 }FATitem;
-
 #endif
 

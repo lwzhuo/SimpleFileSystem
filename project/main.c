@@ -8,6 +8,7 @@ int main()
 {
     startsys();
     showBlock0();
+    // showFAT();
     exitsys();
     return 0;
 }
