@@ -1,3 +1,5 @@
+#ifndef __LIST__
+#define __LIST__
 #include<stdlib.h>
 #include"../global/define.h"
 //某类结构包含link结构，即可有条件形成一个链表。
@@ -83,4 +85,4 @@ void list_destroy(lslink * headptr){
     free(headptr->sptr);
     return;
 }
-
+#endif

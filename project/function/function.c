@@ -8,6 +8,7 @@
 #include"./api.h"
 #include"../global/var.h"
 #include"../util/disk.h"
+#include"../util/list.h"
 void startsys(){//初始化文件系统
     int fd;
     int hasDisk = 1;
@@ -66,7 +67,22 @@ void format(){//文件系统格式化
     fseek(DISK,2*BLOCK_SIZE,SEEK_SET);
     fwrite(fat,sizeof(int),BLOCK_NUMS,DISK);
     free(fat);
-//根目录区
+//根目录区 存放在第4个盘块起始位
+    DirItem_disk dd;
+    dd.inode = BLOCK_SIZE*4+FCB_SIZE*0;
+    strcpy(dd.name,".");
+    writeToDisk(DISK,&dd,sizeof(DirItem_disk),BLOCK_SIZE*3,0);
+//根目录FCB 存放在第5个盘块起始位
+    FCB rootFCB;
+    rootFCB.type = 1;
+    rootFCB.full = 0;
+    rootFCB.creatime = 0;
+    rootFCB.moditime = 0;
+    rootFCB.base = 4;
+    rootFCB.length = 1;
+    writeToDisk(DISK,&rootFCB,sizeof(rootFCB),BLOCK_SIZE*4,0);
+//修改对应FAT表
+    
 }
 
 void showBlock0(){
