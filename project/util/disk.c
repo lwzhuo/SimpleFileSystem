@@ -27,7 +27,7 @@ int readFromDisk(FILE* DISK,void *buff,int size,int base,long offset){
     return 0;
 }
 
-int getFAT(FILE * DISK,FATitem * fatarray){
-    readFromDisk(DISK,fatarray,BLOCK_SIZE*2,BLOCK_SIZE*1,0);
+int getFAT(FILE * DISK,FATitem * FAT){
+    readFromDisk(DISK,FAT,BLOCK_SIZE*2,BLOCK_SIZE*1,0);
     return 0;
 }

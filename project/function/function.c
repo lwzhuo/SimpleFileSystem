@@ -50,7 +50,6 @@ void format(){//文件系统格式化
 
 void startsys(){//初始化文件系统
     int fd;
-    int hasDisk = 1;
 //以创建新文件的方式打开
     if((fd=open(sysname,O_CREAT|O_EXCL,S_IRWXU))<0){
     //打开失败(通常是已经存在这个文件) 检测失败原因
@@ -77,14 +76,16 @@ void startsys(){//初始化文件系统
         printf("fdopen:%d  %s\n",errno,strerror(errno));
         exit(-1);
     }
-//转换成功
     char buff[10];
     if(fread(&block0,sizeof(BLOCK0),1,DISK)==1)//取出第一个磁盘块(引导块)
 //判断是否格式化            
     if(strcmp(block0.identify,"MYDISK")!=0){
         printf("磁盘尚未格式化，开始格式化\n");
         format();
-    }         
+    }
+//进行其他初始化操作
+    strcpy(pwd,"/");//设置当前目录
+    return;         
 }
 
 void showBlock0(){
@@ -95,10 +96,9 @@ void showBlock0(){
 }
 
 void showFAT(){
-    FATitem *fi = malloc(sizeof(FATitem)*FAT_ITEM_NUM);
-    getFAT(DISK,fi);
+    getFAT(DISK,FAT1);
     for(int i=0;i<FAT_ITEM_NUM;i++)
-        printf("item %d:%d\n",i,fi[i].item);
+        printf("item %d:%d\n",i,FAT1[i].item);
 }
 
 void showFCB(int blocknum,int num_in_block){
@@ -110,7 +110,7 @@ fcb.type,fcb.full,fcb.creatime,fcb.moditime,fcb.base,fcb.length);
 }
 
 void my_mkdir(char *dirname){
-
+    
 }
 void exitsys(){//退出文件系统
     fclose(DISK);
