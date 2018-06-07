@@ -36,3 +36,21 @@ int changeFAT(FATitem *FAT,int fat_location){
     writeToDisk(DISK,FAT,FAT_ITEM_SIZE*FAT_ITEM_NUM,fat_location,0);
     return 0;
 }
+
+int getEmptyBlockId(int flag){
+    if(!(flag==DATA_BLOCK||flag==FCB_BLOCK))
+        return -1;
+    int fcbflag=0,dataflag=0;
+    for(int i=0;i<FAT_ITEM_NUM;i++){
+        if(FAT1[i].item==UNUSED_BLOCK&&dataflag==0)
+            dataflag = i;
+        if(FAT1[i].item==FCB_BLOCK_NFULL&&fcbflag==0)
+            fcbflag = i;
+        if(dataflag!=0&&fcbflag!=0)
+            break;
+    }         
+    if(flag==DATA_BLOCK)
+        return dataflag; 
+    else if(flag==FCB_BLOCK)
+        return fcbflag;
+}
