@@ -37,6 +37,20 @@ int changeFAT(FATitem *FAT,int fat_location){
     return 0;
 }
 
+int initFCBBlock(int blocknum){
+    FBi info;
+    info.use=1;
+    writeToDisk(DISK,&info,sizeof(FBi),blocknum*BLOCK_SIZE,0);
+    FAT1[blocknum].item=1;
+    FAT2[blocknum].item=1;
+    changeFAT(FAT1,FAT1_LOCATON);
+    changeFAT(FAT2,FAT2_LOCATON);
+}
+
+int addFCB(FCB fcb,int blocknum,int offset_in_block){
+    writeToDisk(DISK,&fcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*FCB_SIZE);
+}
+
 int getEmptyBlockId(int flag){
     if(!(flag==DATA_BLOCK||flag==FCB_BLOCK))
         return -1;

@@ -36,7 +36,8 @@ void format(){//文件系统格式化
     rootFCB.moditime = 0;
     rootFCB.base = 6;       //起始盘块号
     rootFCB.length = 1;     //长度
-    writeToDisk(DISK,&rootFCB,sizeof(rootFCB),BLOCK_SIZE*6,0);
+    initFCBBlock(6);
+    addFCB(rootFCB,6,1);
 //修改对应FAT表
     fi.item = -1;
     for(int i=0;i<=6;i++){

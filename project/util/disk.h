@@ -8,5 +8,6 @@ int readFromDisk(FILE* DISK,void *buff,int size,int base,long offset);
 int getFAT(FATitem * FAT,int fat_location);
 int changeFAT(FATitem *FAT,int fat_location);
 int getEmptyBlockId();
-int addFCB(int blocknum,int offset_in_block);
+int initFCBBlock(int base);
+int addFCB(FCB fcb,int blocknum,int offset_in_block);
 #endif
