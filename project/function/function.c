@@ -23,19 +23,19 @@ void format(){//文件系统格式化
     fseek(DISK,1*BLOCK_SIZE,SEEK_SET);
     fwrite(fat,sizeof(FATitem),BLOCK_NUMS*2,DISK);
     free(fat);
-//根目录区 存放在第6个盘块起始位
+//根目录区 存放在第6个盘块(5号盘块)起始位
     DirItem_disk dd;
     dd.inode = BLOCK_SIZE*5+FCB_SIZE*0;//FCB位置
     strcpy(dd.name,".");
     writeToDisk(DISK,&dd,sizeof(DirItem_disk),BLOCK_SIZE*5,0);
-//根目录FCB 存放在第7个盘块起始位
+//根目录FCB 存放在第7个盘块(6号盘块)起始位
     FCB rootFCB;
-    rootFCB.type = 1;
-    rootFCB.full = 0;
+    rootFCB.type = 1;       //类型-目录
+    rootFCB.full = 0;       //未存满
     rootFCB.creatime = 0;
     rootFCB.moditime = 0;
-    rootFCB.base = 4;
-    rootFCB.length = 1;
+    rootFCB.base = 6;       //起始盘块号
+    rootFCB.length = 1;     //长度
     writeToDisk(DISK,&rootFCB,sizeof(rootFCB),BLOCK_SIZE*6,0);
 //修改对应FAT表
     fi.item = -1;
