@@ -4,9 +4,11 @@
     void format();
     void showBlock0();
     void showFAT();
+    void reloadFAT();
+    void rewriteFAT();
     void showFCB(int blocknum,int num_in_block);
     void my_cd(char *dirname);
-    void mkdir(char *dirname);
+    void my_mkdir(char *dirname);
     void my_rmdir(char *dirname);
     void my_ls();
     int my_create(char *filename);

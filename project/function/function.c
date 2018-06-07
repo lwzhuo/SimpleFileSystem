@@ -40,12 +40,12 @@ void format(){//文件系统格式化
 //修改对应FAT表
     fi.item = -1;
     for(int i=0;i<=6;i++){
-        writeToDisk(DISK,&fi,sizeof(FATitem),FAT1_BLOCK_LOCATON,i*FAT_ITEM_SIZE);
-        writeToDisk(DISK,&fi,sizeof(FATitem),FAT2_BLOCK_LOCATON,i*FAT_ITEM_SIZE);
+        writeToDisk(DISK,&fi,sizeof(FATitem),FAT1_LOCATON,i*FAT_ITEM_SIZE);
+        writeToDisk(DISK,&fi,sizeof(FATitem),FAT2_LOCATON,i*FAT_ITEM_SIZE);
     }
     fi.item = 1;
-    writeToDisk(DISK,&fi,sizeof(FATitem),FAT1_BLOCK_LOCATON,6*FAT_ITEM_SIZE);
-    writeToDisk(DISK,&fi,sizeof(FATitem),FAT2_BLOCK_LOCATON,6*FAT_ITEM_SIZE);
+    writeToDisk(DISK,&fi,sizeof(FATitem),FAT1_LOCATON,6*FAT_ITEM_SIZE);
+    writeToDisk(DISK,&fi,sizeof(FATitem),FAT2_LOCATON,6*FAT_ITEM_SIZE);
 }
 
 void startsys(){//初始化文件系统
@@ -95,8 +95,18 @@ void showBlock0(){
     printf("identify:%s\ninfo:%s\nrootblock:%d\ndatablock:%d\n",b0.identify,b0.info,b0.root,b0.startblock);
 }
 
+void reloadFAT(){
+    getFAT(FAT1,FAT1_LOCATON);
+    getFAT(FAT2,FAT2_LOCATON);
+}
+
+void rewriteFAT(){
+    changeFAT(FAT1,FAT1_LOCATON);
+    changeFAT(FAT2,FAT2_LOCATON);
+}
+
 void showFAT(){
-    getFAT(DISK,FAT1);
+    getFAT(FAT1,FAT1_LOCATON);
     for(int i=0;i<FAT_ITEM_NUM;i++)
         printf("item %d:%d\n",i,FAT1[i].item);
 }
@@ -108,6 +118,7 @@ void showFCB(int blocknum,int num_in_block){
 modify time %d\nblocknum %d\nlength %d\n",
 fcb.type,fcb.full,fcb.creatime,fcb.moditime,fcb.base,fcb.length);
 }
+
 
 void my_mkdir(char *dirname){
     

@@ -5,5 +5,6 @@
 void createDisk();
 int writeToDisk(FILE* DISK,void *ptr,int size,int base,long offset);
 int readFromDisk(FILE* DISK,void *buff,int size,int base,long offset);
-int getFAT(FILE * DISK,FATitem * fatarray);
+int getFAT(FATitem * FAT,int fat_location);
+int changeFAT(FATitem *FAT,int fat_location);
 #endif
