@@ -63,8 +63,14 @@ int getEmptyBlockId(int flag){
         if(dataflag!=0&&fcbflag!=0)
             break;
     }         
-    if(flag==DATA_BLOCK)
+    if(flag==DATA_BLOCK)//请求一个data块
+        if(dataflag!=0)
         return dataflag; 
-    else if(flag==FCB_BLOCK)
+        else
+            return -1;
+    if(flag==FCB_BLOCK)//请求一个FCB块
+        if(fcbflag!=0)
         return fcbflag;
+        else
+            return dataflag;
 }
