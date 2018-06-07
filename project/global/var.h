@@ -26,6 +26,11 @@ typedef struct FCB{ //16B
     unsigned int base;//文件起始盘块
     unsigned int length;//文件占用盘块数
 }FCB;
+
+typedef struct FCB_Block_info{
+    unsigned long use:64;
+}FBi;
+
 typedef struct Directory{//目录表
     char name[14];       //当前目录名
     int layer;           //层数
