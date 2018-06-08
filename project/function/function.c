@@ -128,6 +128,43 @@ char *getPwd(){
     return pwd;
 }
 
+int my_mkdir(char *dirname){
+//检查是否重名
+    if(findFCBInBlockByName(dirname,presentFCB.base)>0){
+        printf("mkdir: cannot create directory ‘%s’: File exists\n",dirname);
+        return -1;
+    } 
+//获得当前目录表中空余位置，以便存放FCB
+    int offset = getEmptyFCBOffset(presentFCB.base);
+    if(offset<0){
+        printf("mkdir:no empty space to make dirctory\n");
+        return -1;
+    }
+//获得空的盘块以便存储新的目录表
+    int blocknum = getEmptyBlockId();
+    FCB fcb;
+    if(blocknum<0){
+        printf("mkdir:no empty block\n");
+        return -1;
+    }
+//构造FCB
+    strcpy(fcb.name,dirname);
+    fcb.type=1;
+    fcb.use=USED;
+    fcb.creatime=2018;
+    fcb.moditime=2018;
+    fcb.base=blocknum;
+    fcb.length=1;
+    initFCBBlock(blocknum,presentFCBblocknum);
+    addFCB(fcb,presentFCB.base);
+//修改FAT
+    FAT1[blocknum].item=END_OF_FILE;
+    FAT2[blocknum].item=END_OF_FILE;
+    rewriteFAT();
+}
+
+
+
 void exitsys(){//退出文件系统
     fclose(DISK);
 }
