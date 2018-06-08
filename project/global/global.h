@@ -5,6 +5,7 @@
     extern FILE * DISK;
     extern BLOCK0 block0;
     extern char pwd[];
+    extern FCB presentFCB;
     extern FATitem FAT1 [];
     extern FATitem FAT2 [];
 #endif

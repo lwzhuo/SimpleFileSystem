@@ -1,11 +1,4 @@
-//某类结构包含link结构，即可有条件形成一个链表。
-//以下是其结构
-typedef struct lslink lslink;
-typedef struct lslink{
-    void * sptr;
-    lslink *next;
-    lslink *prev;
-}lslink;
+#include"list.h"
 /*  list_init(lslink *headptr)初始化一个链表
 **  headptr - 结点的lslink成员指针 structptr - 结点的首地址*/
 int list_init(lslink *headptr,void *structptr){

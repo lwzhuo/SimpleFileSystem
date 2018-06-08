@@ -2,7 +2,14 @@
 #define __LIST__
 #include<stdlib.h>
 #include"../global/define.h"
-
+//某类结构包含link结构，即可有条件形成一个链表。
+//以下是其结构
+typedef struct lslink lslink;
+typedef struct lslink{
+    void * sptr;
+    lslink *next;
+    lslink *prev;
+}lslink;
 /*  offset(TYPE,MEMBER)计算结构成员偏移量
 **  TYPE - 数据类型 MEMBER - 成员名*/
 #define offset(TYPE,MEMBER) ((size_t)&((TYPE *)0)->MEMBER)
@@ -32,4 +39,9 @@
     list_unlink(linkptr); \
     free(structptr); \
     structptr = NULL
+
+int list_init(lslink *headptr,void *structptr);
+int list_insert(lslink * headptr,lslink * nodeptr,void *structptr);
+void list_unlink(lslink * nodeptr);
+void list_destroy(lslink * headptr);
 #endif

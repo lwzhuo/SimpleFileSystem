@@ -5,9 +5,13 @@
 void createDisk();
 int writeToDisk(FILE* DISK,void *ptr,int size,int base,long offset);
 int readFromDisk(FILE* DISK,void *buff,int size,int base,long offset);
-int getFAT(FATitem * FAT,int fat_location);
-int changeFAT(FATitem *FAT,int fat_location);
-int getEmptyBlockId();
+int getFAT(FATitem * fat,int fat_location);
+int changeFAT(FATitem *fat,int fat_location);
+void reloadFAT();
+void rewriteFAT();
 int initFCBBlock(int base);
-int addFCB(FCB fcb,int blocknum,int offset_in_block);
+int addFCB(FCB fcb,int blocknum);
+int getEmptyFCBOffset(int blocknum);
+int getFCB(FCB *fcb,int blocknum,int offset_in_block);
+int getEmptyBlockId();
 #endif
