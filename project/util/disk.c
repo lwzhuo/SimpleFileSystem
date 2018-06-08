@@ -66,6 +66,7 @@ int addFCB(FCB fcb,int blocknum){
 
 int getEmptyFCBOffset(int blocknum){
     FCB fcblist[FCB_ITEM_NUM];
+    readFromDisk(DISK,fcblist,sizeof(FCB)*FCB_ITEM_NUM,blocknum*BLOCK_SIZE,0);
     int i;
     for(i=0;i<FCB_ITEM_NUM;i++)
         if(fcblist[i].use==FREE)
