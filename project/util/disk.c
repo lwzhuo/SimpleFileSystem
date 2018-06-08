@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<string.h>
 #include"disk.h"
 #include"../global/global.h"
 void createDisk(){
@@ -84,6 +85,19 @@ int addFCB(FCB fcb,int blocknum){
         return 0;
     }
 }
+
+int findFCBInBlockByName(char *name,int blocknum){
+    FCB fcb[FCB_ITEM_NUM];
+    int offset=-1;
+    readFromDisk(DISK,fcb,sizeof(FCB)*FCB_ITEM_NUM,blocknum*BLOCK_SIZE,0);
+    for(int i=0;i<FCB_ITEM_NUM;i++){
+        if(strcmp(fcb[i].name,name)==0)
+            offset=i;
+    }
+    return offset;
+}
+
+
 
 int getEmptyFCBOffset(int blocknum){
     FCB fcblist[FCB_ITEM_NUM];
