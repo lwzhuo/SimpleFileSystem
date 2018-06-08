@@ -32,25 +32,16 @@ void format(){//文件系统格式化
     rootFCB.moditime = 0;
     rootFCB.base = 6;       //起始盘块号
     rootFCB.length = 1;     //长度
-    initFCBBlock(5);
+    FAT1[5].item=FCB_BLOCK;
+    FAT2[5].item=FCB_BLOCK;
     addFCB(rootFCB,5);
 //根目录FCB 存放在第7个盘块(6号盘块)起始位
-    FCB fcb;
-    strcpy(fcb.name,".");
-    fcb.type=1;
-    fcb.use=USED;
-    fcb.creatime=2018;
-    fcb.moditime=2018;
-    fcb.base=5;
-    fcb.length=1;
-    initFCBBlock(6);
-    addFCB(fcb,6);
+    initFCBBlock(6,6);
 //修改对应FAT表
     fi.item = END_OF_FILE;
-    for(int i=0;i<=6;i++){
-        writeToDisk(DISK,&fi,sizeof(FATitem),FAT1_LOCATON,i*FAT_ITEM_SIZE);
-        writeToDisk(DISK,&fi,sizeof(FATitem),FAT2_LOCATON,i*FAT_ITEM_SIZE);
-    }
+    for(int i=0;i<5;i++)
+        FAT1[i].item=USED;
+    rewriteFAT();
 }
 
 void startsys(){//初始化文件系统
@@ -90,6 +81,7 @@ void startsys(){//初始化文件系统
     }
 //进行其他初始化操作
     strcpy(pwd,"/");//设置当前目录
+    presentFCBblocknum = 5;//设置当前的FCB盘块号
     getFCB(&presentFCB,5,0);//将根目录设置成当前内存中的FCB
     getFAT(FAT1,FAT1_LOCATON);//加载FAT1
     getFAT(FAT2,FAT2_LOCATON);//加载FAT2
@@ -108,7 +100,7 @@ void showFAT(){
     getFAT(FAT1,FAT1_LOCATON);
     for(int i=0,j=1;i<FAT_ITEM_NUM;i++,j++){
          printf("item %d:%d",i,FAT1[i].item);
-         if(j%6==0)
+         if(j%10==0)
             printf("\n");
         else
             printf("\t");
@@ -119,9 +111,10 @@ void showFAT(){
 void showFCB(int blocknum,int num_in_block){
     FCB fcb;
     readFromDisk(DISK,&fcb,sizeof(fcb),blocknum*BLOCK_SIZE,num_in_block*FCB_SIZE);
-    printf("type %d\nused %d\ncreate time %d\n\
+    printf("*****block %d offset %d*****\n",blocknum,num_in_block);
+    printf("%s type %d\nused %d\ncreate time %d\n\
 modify time %d\nblocknum %d\nlength %d\n",
-fcb.type,fcb.use,fcb.creatime,fcb.moditime,fcb.base,fcb.length);
+fcb.name,fcb.type,fcb.use,fcb.creatime,fcb.moditime,fcb.base,fcb.length);
 }
 
 char *getPwd(){
@@ -163,7 +156,9 @@ int my_mkdir(char *dirname){
     rewriteFAT();
 }
 
+void my_rmdir(char *dirname){
 
+}
 
 void exitsys(){//退出文件系统
     fclose(DISK);

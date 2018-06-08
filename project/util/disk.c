@@ -97,7 +97,10 @@ int findFCBInBlockByName(char *name,int blocknum){
     return offset;
 }
 
-
+// int removeFCB(int blocknum,int offset_in_block){
+//     FCB fcb[FCB_ITEM_NUM];
+//     readFromDisk(DISK,fcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*FCB_SIZE);
+// }
 
 int getEmptyFCBOffset(int blocknum){
     FCB fcblist[FCB_ITEM_NUM];

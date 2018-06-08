@@ -6,7 +6,7 @@
     void showFAT();
     void showFCB(int blocknum,int num_in_block);
     void my_cd(char *dirname);
-    void my_mkdir(char *dirname);
+    int my_mkdir(char *dirname);
     void my_rmdir(char *dirname);
     void my_ls();
     int my_create(char *filename);
