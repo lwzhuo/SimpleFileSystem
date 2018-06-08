@@ -47,10 +47,31 @@ void rewriteFAT(){
     changeFAT(FAT2,FAT2_LOCATON);
 }
 
-int initFCBBlock(int blocknum){
+int initFCBBlock(int blocknum,int parentblocknum){
+//修改FAT
     FAT1[blocknum].item=FCB_BLOCK;
     FAT2[blocknum].item=FCB_BLOCK;
     rewriteFAT();
+//加入.和..目录
+//.目录
+    FCB fcb;
+    strcpy(fcb.name,".");
+    fcb.type=1;
+    fcb.use=USED;
+    fcb.creatime=2018;
+    fcb.moditime=2018;
+    fcb.base=blocknum;//指向当前目录
+    fcb.length=1;
+    addFCB(fcb,blocknum);
+//..目录
+    strcpy(fcb.name,"..");
+    fcb.type=1;
+    fcb.use=USED;
+    fcb.creatime=2018;
+    fcb.moditime=2018;
+    fcb.base=blocknum;//指向父目录
+    fcb.length=1;
+    addFCB(fcb,blocknum);
     return 0;
 }
 
