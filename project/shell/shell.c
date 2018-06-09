@@ -8,7 +8,7 @@
 char * header(){
     char *buff;
     buff = (char *)malloc(sizeof(char)*100);
-    sprintf(buff,"%s:%s$ ",sysname,pwd);
+    sprintf(buff,"\033[33m\033[01m%s\033[0m:\033[36m\033[01m%s\033[0m$ ",sysname,pwd);
     return buff;
 }
 char ** getInstruction(int *argc){
@@ -48,6 +48,41 @@ int doOpration(int argc,char ** argv){
             return 0;
         }  
     }
+
+    if(strcmp(argv[0],"ls")==0){
+        if(argc>1){
+            printf("%s : too many arguments\n",argv[0]);
+            return -1;
+        }
+        else{
+            my_ls();
+            return 0;
+        }  
+    }
+
+    if(strcmp(argv[0],"mkdir")==0){
+        if(argc!=2){
+            printf("usage %s [directory name]\n",argv[0]);
+            return -1;
+        }
+        else{
+            my_mkdir(argv[1]);
+            return 0;
+        }  
+    }
+
+    if(strcmp(argv[0],"cd")==0){
+        if(argc!=2){
+            printf("usage %s [directory name]\n",argv[0]);
+            return -1;
+        }
+        else{
+            my_cd(argv[1]);
+            return 0;
+        }  
+    }
+
+    printf("%s: command not found\n",argv[0]);
     return 0;
 }
 void go(){
