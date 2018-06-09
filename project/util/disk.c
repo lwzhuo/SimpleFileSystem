@@ -48,7 +48,7 @@ void rewriteFAT(){
     changeFAT(FAT1,FAT1_LOCATON);
     changeFAT(FAT2,FAT2_LOCATON);
 }
-
+//初始化一个目录块 blocknum-将要初始化的块号 parentblocknum-父目录块号
 int initFCBBlock(int blocknum,int parentblocknum){
 //修改FAT
     FAT1[blocknum].item=FCB_BLOCK;
@@ -71,7 +71,7 @@ int initFCBBlock(int blocknum,int parentblocknum){
     fcb.use=USED;
     fcb.creatime=2018;
     fcb.moditime=2018;
-    fcb.base=blocknum;//指向父目录
+    fcb.base=parentblocknum;//指向父目录
     fcb.length=1;
     addFCB(fcb,blocknum);
     return 0;
@@ -86,22 +86,27 @@ int addFCB(FCB fcb,int blocknum){
         return 0;
     }
 }
-
+//根据名字在当前目录块寻找对应(已被使用的)FCB
 int findFCBInBlockByName(char *name,int blocknum){
     FCB fcb[FCB_ITEM_NUM];
     int offset=-1;
     readFromDisk(DISK,fcb,sizeof(FCB)*FCB_ITEM_NUM,blocknum*BLOCK_SIZE,0);
     for(int i=0;i<FCB_ITEM_NUM;i++){
-        if(strcmp(fcb[i].name,name)==0)
+        if(fcb[i].use==USED){
+            if(strcmp(fcb[i].name,name)==0)
             offset=i;
+        }
     }
     return offset;
 }
 
-// int removeFCB(int blocknum,int offset_in_block){
-//     FCB fcb[FCB_ITEM_NUM];
-//     readFromDisk(DISK,fcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*FCB_SIZE);
-// }
+int removeFCB(int blocknum,int offset_in_block){
+    FCB fcb;
+    readFromDisk(DISK,&fcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*BLOCK_SIZE);
+    fcb.use=0;
+    writeToDisk(DISK,&fcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*BLOCK_SIZE);
+    return 0;
+}
 
 int getEmptyFCBOffset(int blocknum){
     FCB fcblist[FCB_ITEM_NUM];

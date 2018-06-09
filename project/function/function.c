@@ -23,7 +23,7 @@ void format(){//文件系统格式化
     fseek(DISK,1*BLOCK_SIZE,SEEK_SET);
     fwrite(fat,sizeof(FATitem),BLOCK_NUMS*2,DISK);
     free(fat);
-//根目录区 存放在第6个盘块(5号盘块)起始位
+//根目录区 存放在5号盘块
     FCB rootFCB;
     strcpy(rootFCB.name,"/");
     rootFCB.type = 1;       //类型-目录
@@ -35,7 +35,7 @@ void format(){//文件系统格式化
     FAT1[5].item=FCB_BLOCK;
     FAT2[5].item=FCB_BLOCK;
     addFCB(rootFCB,5);
-//根目录FCB 存放在第7个盘块(6号盘块)起始位
+//根目录FCB 存放在6号盘块
     initFCBBlock(6,6);
 //修改对应FAT表
     fi.item = END_OF_FILE;
@@ -130,7 +130,7 @@ int my_mkdir(char *dirname){
 //获得当前目录表中空余位置，以便存放FCB
     int offset = getEmptyFCBOffset(presentFCB.base);
     if(offset<0){
-        printf("mkdir:no empty space to make dirctory\n");
+        printf("mkdir:no empty space to make directory\n");
         return -1;
     }
 //获得空的盘块以便存储新的目录表
@@ -148,27 +148,59 @@ int my_mkdir(char *dirname){
     fcb.moditime=2018;
     fcb.base=blocknum;
     fcb.length=1;
-    initFCBBlock(blocknum,presentFCBblocknum);
-    addFCB(fcb,presentFCB.base);
+    initFCBBlock(blocknum,presentFCB.base);
+    addFCB(fcb,presentFCB.base);//在当前目录表加入这个目录项
 //修改FAT
     FAT1[blocknum].item=END_OF_FILE;
     FAT2[blocknum].item=END_OF_FILE;
     rewriteFAT();
 }
 
-
+// void my_rmdir(char *dirname){
+// //检查是否有这个目录
+//     int offset;
+//     FCB fcb;
+//     if((offset=findFCBInBlockByName(dirname,presentFCBblocknum))<0){
+//         printf("rm: cannot remove '%s': No such file or directory",dirname);
+//         return -1;
+//     }else{
+//     // 清空这个FCB指向的盘块
+//         getFCB(&fcb,presentFCB,offset);
+//         FAT1[fcb.base].item=FREE;
+//         FAT2[fcb.base].item=FREE;
+//         rewriteFAT();
+//     //删除这个FCB
+//         removeFCB(presentFCBblocknum,offset);
+    
+//     }
+// }
 
 void my_ls(){
-    int blocknum = presentFCB.base;
+    int blocknum = presentFCB.base;//获得当前fcb所在的盘块号
     lslink *FCBlisthead,*temp;
     FCBList FL,*Fnode;
     FCBlisthead = &(FL.link);
 
+    printf("directory %s\n",presentFCB.name);
     getFCBList(blocknum,FL,FCBlisthead);
     list_for_each(temp,FCBlisthead){
         Fnode = list_entry(temp,FCBList,link);
         printf("name %s type:%d\n",Fnode->fcb_entry.name,Fnode->fcb_entry.type);
     }
+}
+
+int my_cd(char *dirname){
+    int offset;
+    if((offset=findFCBInBlockByName(dirname,presentFCB.base))<0){
+        printf("cd: %s: No such file or directory\n",dirname);
+        return -1;
+    }else{
+        FCB fcb;
+        getFCB(&fcb,presentFCB.base,offset);
+        presentFCBblocknum = presentFCB.base;//修改当前fcb所在的盘块号
+        presentFCB=fcb;//修改当前fcb值
+        return 0;
+    }    
 }
 
 void exitsys(){//退出文件系统

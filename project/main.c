@@ -38,14 +38,33 @@ int main()
     // printf("empty block %d\n",getEmptyBlockId(DATA_BLOCK));
     // printf("fcb block %d\n",getEmptyBlockId(FCB_BLOCK));
 //创建新的目录
-    my_mkdir("a");
+    my_mkdir("hhhhh");
 //显示刚刚创建的目录信息
     showFCB(6,0);
     showFCB(6,1);
     showFCB(6,2);
     showFCB(6,3);
 //显示当前目录文件
-printf("**********ls**********\n");
+    printf("**********ls**********\n");
+    printf("presentFCBblocknum %d\n",presentFCBblocknum);
+    printf("present FCB base %d\n",presentFCB.base);
+    my_ls();
+//显示当前目录文件
+    // printf("**********cd**********\n");
+    // my_cd(".");
+    // my_ls();
+    // printf("**********cd**********\n");
+    // my_cd("..");
+    // my_ls();
+    printf("**********cd**********\n");
+    my_cd("a");
+    my_ls();
+    printf("present FCB base %d\n",presentFCB.base);
+    
+    printf("**********cd**********\n");
+    my_cd("..");
+    printf("present FCB base %d\n",presentFCB.base);
+    my_cd("hhhhh");
     my_ls();
     exitsys();
     return 0;
