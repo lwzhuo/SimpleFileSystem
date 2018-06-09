@@ -20,13 +20,16 @@ char ** split(char *string,char * delimiters,int *num){
             break;
         }
     }
-    *num = a-1;
+    if(arg!=NULL)//判断参数是否超出个数
+        *num=-1;
+    else
+        *num = a-1;
     return result;
 }
 char * trim(char *str){
     int len=0;
     char *temp = str;
-    int start;
+    int start=0;
     if(temp==NULL||*temp=='\0')
         return str;
     while (*temp!='\0'&&isspace(*temp)){
@@ -36,6 +39,6 @@ char * trim(char *str){
     temp = str+strlen(str)-1;
     while(*temp!='\0'&&isspace(*temp))
         temp++;
-    *temp='\0';
+    *(temp+1)='\0';
     return str+start;
 }
