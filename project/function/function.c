@@ -181,11 +181,11 @@ void my_ls(){
     FCBList FL,*Fnode;
     FCBlisthead = &(FL.link);
 
-    printf("directory %s\n",presentFCB.name);
+    printf("directory %s\n",pwd);
     getFCBList(blocknum,FL,FCBlisthead);
     list_for_each(temp,FCBlisthead){
         Fnode = list_entry(temp,FCBList,link);
-        printf("name %s type:%d\n",Fnode->fcb_entry.name,Fnode->fcb_entry.type);
+        printf("%-12s type:%d\n",Fnode->fcb_entry.name,Fnode->fcb_entry.type);
     }
 }
 
@@ -199,6 +199,23 @@ int my_cd(char *dirname){
         getFCB(&fcb,presentFCB.base,offset);
         presentFCBblocknum = presentFCB.base;//修改当前fcb所在的盘块号
         presentFCB=fcb;//修改当前fcb值
+        if(strcmp(dirname,".")==0)//当前目录
+            ;
+        else if(strcmp(dirname,"..")==0){//上一级目录
+            if(strcmp(pwd,"/")!=0){//不是根目录情况
+                char *a = strchr(pwd,'/');//从左往右第一次出现/的位置
+                char *b = strrchr(pwd,'/');//从右往左第一次出现/的位置
+                if(a!=b)//判断是否只有一个/字符 不相等则有多个
+                    *b='\0';
+                else
+                    *(b+1)='\0';
+            }
+        }
+        else{//下一级目录
+            if(strcmp(pwd,"/")!=0)
+                strcat(pwd,"/");
+            strcat(pwd,dirname);
+        }
         return 0;
     }    
 }
