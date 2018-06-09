@@ -2,6 +2,7 @@
 #include<string.h>
 #include"disk.h"
 #include"../global/global.h"
+#include"list.h"
 void createDisk(){
     char buff[BLOCK_SIZE]={'0'};
     FILE *f = fopen(sysname,"r+");
@@ -116,6 +117,19 @@ int getEmptyFCBOffset(int blocknum){
 int getFCB(FCB *fcb,int blocknum,int offset_in_block){
     readFromDisk(DISK,fcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*FCB_SIZE);
     return 0;
+}
+
+int getFCBList(int blocknum,FCBList FLstruct,lslink *fcblisthead){
+    FCB fcblist[FCB_ITEM_NUM];
+    readFromDisk(DISK,&fcblist,sizeof(FCB)*FCB_ITEM_NUM,blocknum*BLOCK_SIZE,0);
+    list_init(fcblisthead,&FLstruct);
+    for(int i=0;i<FCB_ITEM_NUM;i++){
+        if(fcblist[i].use==USED){
+            FCBList *temp = get_node(FCBList);
+            temp->fcb_entry = fcblist[i];
+            list_insert(fcblisthead,&(temp->link),temp);
+        }  
+    }
 }
 
 int getEmptyBlockId(){

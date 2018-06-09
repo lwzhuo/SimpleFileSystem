@@ -16,12 +16,17 @@ typedef struct BLOCK0{
 typedef struct FCB{ //16B
     char name[11];
     unsigned type:1;//标志文件类型 1-目录 2-文件
-    unsigned use:1;//标志使用状态 1-已使用 0-未使用
+    unsigned use:1;//标志使用状态 1-已使用(USED) 0-未使用(FREE)
     unsigned short creatime;
     unsigned short moditime;
     unsigned int base;//文件起始盘块
     unsigned int length;//文件长度
 }FCB;
+
+typedef struct FCBList{
+    FCB fcb_entry;
+    lslink link;
+}FCBList;
 
 typedef struct FATitem{//FAT表项 2B -32767-32768
     signed short item:16;

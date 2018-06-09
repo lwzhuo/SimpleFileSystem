@@ -156,8 +156,19 @@ int my_mkdir(char *dirname){
     rewriteFAT();
 }
 
-void my_rmdir(char *dirname){
 
+
+void my_ls(){
+    int blocknum = presentFCB.base;
+    lslink *FCBlisthead,*temp;
+    FCBList FL,*Fnode;
+    FCBlisthead = &(FL.link);
+
+    getFCBList(blocknum,FL,FCBlisthead);
+    list_for_each(temp,FCBlisthead){
+        Fnode = list_entry(temp,FCBList,link);
+        printf("name %s type:%d\n",Fnode->fcb_entry.name,Fnode->fcb_entry.type);
+    }
 }
 
 void exitsys(){//退出文件系统
