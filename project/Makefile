@@ -28,4 +28,4 @@ str.o:./util/str.c ./util/str.h
 	mv str.o $(OUTDIR)/str.o
 .PHONY:clean
 clean:
-	-rm $(OUTDIR)/function.o $(OUTDIR)/main.o $(OUTDIR)/disk.o
+	-rm $(OUTDIR)/main.o $(OUTDIR)/function.o $(OUTDIR)/disk.o $(OUTDIR)/list.o $(OUTDIR)/shell.o $(OUTDIR)/str.o
