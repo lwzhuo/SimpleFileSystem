@@ -125,7 +125,7 @@ char *getPwd(){
 int my_mkdir(char *dirname){
 //判断文件名长度
     if(strlen(dirname)>FILE_NAME_LEN){
-        printf("mkdir: cannot create directory ‘%s’: file name must less than %d bytes\n",dirname,FILE_NAME_LEN);
+        printf("mkdir: cannot create directory ‘%s’: directory name must less than %d bytes\n",dirname,FILE_NAME_LEN);
         return -1;
     }
 //检查是否重名
@@ -203,6 +203,10 @@ int my_cd(char *dirname){
     }else{
         FCB fcb;
         getFCB(&fcb,presentFCB.base,offset);
+        if(fcb.type==0){
+            printf("cd: %s: Not a directory\n",dirname);
+            return -1;
+        }
         presentFCBblocknum = presentFCB.base;//修改当前fcb所在的盘块号
         presentFCB=fcb;//修改当前fcb值
         if(strcmp(dirname,".")==0)//当前目录
@@ -225,6 +229,68 @@ int my_cd(char *dirname){
         return 0;
     }    
 }
+
+int my_create(char *filename){
+    //判断文件名长度
+    if(strlen(filename)>FILE_NAME_LEN){
+        printf("create: cannot create file ‘%s’: file name must less than %d bytes\n",filename,FILE_NAME_LEN);
+        return -1;
+    }
+    int offset = findFCBInBlockByName(filename,presentFCB.base);
+    if(offset>0){//判断是否已经存在此文件
+        printf("create: cannot create file ‘%s’: File exists\n",filename);
+        return -1;
+    }else{
+        offset = getEmptyFCBOffset(presentFCB.base);//判断FCB块是否有剩余空间加入FCB
+        if(offset<0){
+            printf("create: cannot create file ‘%s’: %s Lack of space\n",pwd,filename);
+            return -1;
+        }else{
+            int blocknum = getEmptyBlockId();
+            if(blocknum<0){
+                printf("create: cannot create file ‘%s’: %s Lack of space\n",sysname,filename);
+                return -1;
+            }else{
+            //构建FCB
+                FCB fcb;
+                strcpy(fcb.name,filename);
+                fcb.type=0;
+                fcb.use=USED;
+                fcb.time=2018;
+                fcb.date=2018;
+                fcb.base=blocknum;
+                fcb.length=1;
+                addFCB(fcb,presentFCB.base);
+            //修改FAT
+                FAT1[blocknum].item=USED;
+                FAT2[blocknum].item=USED;
+                rewriteFAT();
+                return 0;
+            }
+        }
+    }
+    return 0;
+}
+
+int my_rm(char *filename){
+    int offset = findFCBInBlockByName(filename,presentFCB.base);
+    if(offset<0){//判断是否已经存在此文件
+        printf("rm: cannot remove '%s': No such file\n",filename);
+        return -1;
+    }else{
+    //修改FAT
+        FCB fcb;
+        getFCB(&fcb,presentFCB.base,offset);
+        FAT1[fcb.base].item=FREE;
+        FAT2[fcb.base].item=FREE;
+        rewriteFAT();
+    //删除FCB
+        removeFCB(presentFCB.base,offset);
+        return 0;
+    }
+}
+
+
 
 void exitsys(){//退出文件系统
     fclose(DISK);
