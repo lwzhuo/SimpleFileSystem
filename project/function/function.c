@@ -86,6 +86,9 @@ void startsys(){//初始化文件系统
     getFCB(&presentFCB,5,0);//将根目录设置成当前内存中的FCB
     getFAT(FAT1,FAT1_LOCATON);//加载FAT1
     getFAT(FAT2,FAT2_LOCATON);//加载FAT2
+//初始化文件打开表
+    for(int i=0;i<MAX_FD_NUM;i++)
+        uopenlist[i].topenfile=FREE;//全部设置成0
     return;         
 }
 
@@ -114,7 +117,7 @@ void showFCB(int blocknum,int num_in_block){
     readFromDisk(DISK,&fcb,sizeof(fcb),blocknum*BLOCK_SIZE,num_in_block*FCB_SIZE);
     printf("*****block %d offset %d*****\n",blocknum,num_in_block);
     printf("%s type %d\nused %d\ncreate time %d\n\
-modify time %d\nblocknum %d\nlength %d\n",
+create date %d\nblocknum %d\nlength %d\n",
 fcb.name,fcb.type,fcb.use,fcb.time,fcb.date,fcb.base,fcb.length);
 }
 
@@ -262,8 +265,8 @@ int my_create(char *filename){
                 fcb.length=1;
                 addFCB(fcb,presentFCB.base);
             //修改FAT
-                FAT1[blocknum].item=USED;
-                FAT2[blocknum].item=USED;
+                FAT1[blocknum].item=END_OF_FILE;
+                FAT2[blocknum].item=END_OF_FILE;
                 rewriteFAT();
                 return 0;
             }
@@ -290,7 +293,44 @@ int my_rm(char *filename){
     }
 }
 
+int my_open(char *filename){
+    int fd;
+    fd = findfdByNameAndDir(filename,pwd);
+    if(fd>0){//判断是否已经打开
+        printf("open: cannot open file ‘%s’: %s is already open\n",filename,filename);
+        return -1;
+    }
+    if((fd=getEmptyfd())<0){//查看是否有空的fd
+        printf("open: cannot open file ‘%s’: Lack of empty fd\n",filename);
+        return -1;
+    }else{
+        int offset = findFCBInBlockByName(filename,presentFCB.base);//获得fcb位置
+        if(offset<0){
+            printf("open: %s: No such file or directory\n",filename);
+            return -1;
+        }else{
+        //构造打开表项
+            FCB fcb;
+            getFCB(&fcb,presentFCB.base,offset);
+            uopenlist[fd].fcb = fcb;
+            strcpy(uopenlist[fd].dir,pwd);
+            uopenlist[fd].count = 0;
+            uopenlist[fd].fcbstate = 0;
+            uopenlist[fd].topenfile = 1;
+            return 0;
+        }
+    }
+}
 
+void showfdList(){
+    int num=0;
+    for(int i=0;i<MAX_FD_NUM;i++){
+        if(uopenlist[i].topenfile==USED){
+            num++;
+            printf("%d %s %s %d\n",num,uopenlist[i].fcb.name,uopenlist[i].dir,uopenlist[i].count);
+        }
+    }
+}
 
 void exitsys(){//退出文件系统
     fclose(DISK);

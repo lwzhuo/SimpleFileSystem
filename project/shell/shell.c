@@ -24,9 +24,31 @@ char ** getInstruction(int *argc){
     Ins = split(buff," ",argc);
     return Ins;
 }
-
+void help(){
+    printf("**********************HELP**********************\n");
+    printf("%-10s - %s\n","exit","exit system");
+    printf("%-10s - %s\n","pwd","print name of current/working directory");
+    printf("%-10s - %s\n","ls","list directory contents");
+    printf("%-10s - %s\n","mkdir","make directories");
+    printf("%-10s - %s\n","cd","change working directory");
+    printf("%-10s - %s\n","create","create new file");
+    printf("%-10s - %s\n","create","create new file");
+    printf("%-10s - %s\n","rm","remove files or directories");
+    printf("%-10s - %s\n","open","open a file");
+}
 int doOpration(int argc,char ** argv){
     //printf("%d **%s**\n",argc,argv[0]);
+    if(strcmp(argv[0],"help")==0){
+        if(argc>1){
+            printf("%s : too many arguments\n",argv[0]);
+            return -1;
+        }
+        else{
+            help();
+            return 0;
+        }  
+    }
+
     if(strcmp(argv[0],"exit")==0){
         if(argc>1){
             printf("%s : too many arguments\n",argv[0]);
@@ -102,6 +124,69 @@ int doOpration(int argc,char ** argv){
             my_rm(argv[1]);
             return 0;
         }  
+    }
+
+    if(strcmp(argv[0],"open")==0){
+        if(argc!=2){
+            printf("usage %s [file name]\n",argv[0]);
+            return -1;
+        }
+        else{
+            my_open(argv[1]);
+            return 0;
+        }
+    }
+
+    if(strcmp(argv[0],"block0")==0){
+         if(argc>1){
+            printf("%s : too many arguments\n",argv[0]);
+            return -1;
+        }
+        else{
+            showBlock0();
+            return 0;
+        }
+    }
+
+    if(strcmp(argv[0],"fat")==0){
+         if(argc>1){
+            printf("%s : too many arguments\n",argv[0]);
+            return -1;
+        }
+        else{
+            showFAT();
+            return 0;
+        }
+    }
+
+    if(strcmp(argv[0],"fcb")==0){
+        if(argc!=3){
+            printf("usage %s [blocknum] [FCB offset in block]\n",argv[0]);
+            return -1;
+        }
+        else{
+            int a1,a2;
+            //printf("a1%s a2%s\n",argv[1],argv[2]);
+            a1 = atoi(argv[1]);
+            a2 = atoi(argv[2]);
+            if((strcmp(argv[1],"0")&&a1==0)||(strcmp(argv[2],"0")&&a2==0)){
+                printf("usage %s [blocknum] [FCB offset in block]\n",argv[0]);
+                return -1;
+            }
+            showFCB(a1,a2);
+            return 0;
+        }  
+    }
+
+     if(strcmp(argv[0],"opl")==0){
+         if(argc>1){
+            printf("%s : too many arguments\n",argv[0]);
+            return -1;
+        }
+        else{
+            showfdList();
+            return 0;
+        }
     }
 
     printf("%s: command not found\n",argv[0]);

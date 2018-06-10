@@ -33,17 +33,11 @@ typedef struct FATitem{//FAT表项 2B -32767-32768
 }FATitem;
 
 typedef struct useropen{
-    char filename[FILE_NAME_LEN];
-    unsigned type:1;//标志文件类型 1-目录 0-文件
-    unsigned use:1;//标志使用状态 1-已使用(USED) 0-未使用(FREE)
-    unsigned short time;
-    unsigned short date;
-    unsigned int base;//文件起始盘块
-    unsigned int length;//文件长度
+    FCB fcb;
     char dir[80];
-    int count;
-    unsigned fcbstate;
-    unsigned topenfile;
+    int count;//文件指针的位置
+    unsigned fcbstate:1;//标志fcb是否被修改 1-已修改 0-未修改
+    unsigned topenfile:1;//标志使用状态 1-已使用(USED) 0-未使用(FREE)
 }useropen;
 #endif
 

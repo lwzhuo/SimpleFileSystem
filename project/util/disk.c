@@ -150,3 +150,33 @@ int getEmptyBlockId(){
     else
         return flag;
 }
+
+int getOpenNum(){
+    int num=0;
+    for(int i=0;i<MAX_FD_NUM;i++)
+        if(uopenlist[i].topenfile==USED)
+            num++;
+    return num;
+}
+
+int getEmptyfd(){
+    int fd=-1;
+    for(int i=0;i<MAX_FD_NUM;i++)
+        if((uopenlist[i].topenfile==FREE)&&(fd==-1)){
+            fd=i;
+            break;
+        }  
+    return fd;
+}
+
+int findfdByNameAndDir(char *filename,char *dirname){
+    int fd=-1;
+    for(int i=0;i<MAX_FD_NUM;i++)
+        if(strcmp(filename,uopenlist[i].fcb.name)==0){
+            if(strcmp(dirname,uopenlist[i].dir)==0){
+                fd=i;
+                break;
+            }
+        }  
+    return fd;
+}
