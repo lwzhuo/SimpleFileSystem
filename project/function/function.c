@@ -317,8 +317,26 @@ int my_open(char *filename){
             uopenlist[fd].count = 0;
             uopenlist[fd].fcbstate = 0;
             uopenlist[fd].topenfile = USED;
+            uopenlist[fd].blocknum = presentFCB.base;
+            uopenlist[fd].offset_in_block = findFCBInBlockByName(filename,presentFCB.base);
             return 0;
         }
+    }
+}
+
+int my_close(int fd){
+    if(fd>=MAX_FD_NUM||fd<0){
+        printf("close: invalid fd\n");
+        return -1;
+    }else{
+        if(uopenlist[fd].topenfile==FREE){//判断是否已经关闭
+            printf("close: cannot close fd ‘%d’: fd %d is already close\n",fd,fd);
+            return -1;
+        }
+        if(uopenlist[fd].fcbstate==1)//fcb被修改了
+            changeFCB(uopenlist[fd].fcb,uopenlist[fd].blocknum,uopenlist[fd].offset_in_block);
+        uopenlist[fd].topenfile=FREE;//清空文件打开表项
+        return 0;
     }
 }
 
@@ -327,7 +345,9 @@ void showfdList(){
     for(int i=0;i<MAX_FD_NUM;i++){
         if(uopenlist[i].topenfile==USED){
             num++;
-            printf("%d %s %s %d\n",num,uopenlist[i].fcb.name,uopenlist[i].dir,uopenlist[i].count);
+            printf("%-2d fd:%d name:%s dir:%s fileptr:%d block:%d offset:%d\n",num,i,
+            uopenlist[i].fcb.name,uopenlist[i].dir,uopenlist[i].count,
+            uopenlist[i].blocknum,uopenlist[i].offset_in_block);
         }
     }
 }

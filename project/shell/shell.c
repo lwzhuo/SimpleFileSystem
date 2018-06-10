@@ -137,6 +137,23 @@ int doOpration(int argc,char ** argv){
         }
     }
 
+    if(strcmp(argv[0],"close")==0){
+        if(argc!=2){
+            printf("usage %s [fd num]\n",argv[0]);
+            return -1;
+        }
+        else{
+            int a;
+            a = atoi(argv[1]);
+            if(strcmp(argv[1],"0")&&a==0){
+                printf("usage %s [fd num]\n",argv[0]);
+                return -1;
+            }
+            my_close(a);
+            return 0;
+        }  
+    }
+
     if(strcmp(argv[0],"block0")==0){
          if(argc>1){
             printf("%s : too many arguments\n",argv[0]);

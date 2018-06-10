@@ -100,6 +100,11 @@ int findFCBInBlockByName(char *name,int blocknum){
     return offset;
 }
 
+int changeFCB(FCB newfcb,int blocknum,int offset_in_block){
+    writeToDisk(DISK,&newfcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*FCB_SIZE);
+    return 0;
+}
+
 int removeFCB(int blocknum,int offset_in_block){
     FCB fcb;
     readFromDisk(DISK,&fcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*FCB_SIZE);

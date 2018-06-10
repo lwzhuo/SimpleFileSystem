@@ -11,6 +11,7 @@ void reloadFAT();
 void rewriteFAT();
 int initFCBBlock(int blocknum,int parentblocknum);
 int addFCB(FCB fcb,int blocknum);
+int changeFCB(FCB newfcb,int blocknum,int offset_in_block);
 int removeFCB(int blocknum,int offset_in_block);
 int findFCBInBlockByName(char *name,int blocknum);
 int getEmptyFCBOffset(int blocknum);
