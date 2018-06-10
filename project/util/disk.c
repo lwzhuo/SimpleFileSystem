@@ -60,8 +60,8 @@ int initFCBBlock(int blocknum,int parentblocknum){
     strcpy(fcb.name,".");
     fcb.type=1;
     fcb.use=USED;
-    fcb.creatime=2018;
-    fcb.moditime=2018;
+    fcb.time=2018;
+    fcb.date=2018;
     fcb.base=blocknum;//指向当前目录
     fcb.length=1;
     addFCB(fcb,blocknum);
@@ -69,8 +69,8 @@ int initFCBBlock(int blocknum,int parentblocknum){
     strcpy(fcb.name,"..");
     fcb.type=1;
     fcb.use=USED;
-    fcb.creatime=2018;
-    fcb.moditime=2018;
+    fcb.time=2018;
+    fcb.date=2018;
     fcb.base=parentblocknum;//指向父目录
     fcb.length=1;
     addFCB(fcb,blocknum);
@@ -102,9 +102,9 @@ int findFCBInBlockByName(char *name,int blocknum){
 
 int removeFCB(int blocknum,int offset_in_block){
     FCB fcb;
-    readFromDisk(DISK,&fcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*BLOCK_SIZE);
+    readFromDisk(DISK,&fcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*FCB_SIZE);
     fcb.use=0;
-    writeToDisk(DISK,&fcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*BLOCK_SIZE);
+    writeToDisk(DISK,&fcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*FCB_SIZE);
     return 0;
 }
 

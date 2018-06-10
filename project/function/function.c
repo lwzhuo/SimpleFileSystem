@@ -7,6 +7,7 @@
 #include<unistd.h>
 #include"../util/disk.h"
 #include"../global/global.h"
+#include"../global/define.h"
 void format(){//文件系统格式化
 //引导块 BLOCK0
     strcpy(block0.identify,"MYDISK");
@@ -28,8 +29,8 @@ void format(){//文件系统格式化
     strcpy(rootFCB.name,"/");
     rootFCB.type = 1;       //类型-目录
     rootFCB.use = USED;        //已使用
-    rootFCB.creatime = 0;
-    rootFCB.moditime = 0;
+    rootFCB.time = 0;
+    rootFCB.date = 0;
     rootFCB.base = 6;       //起始盘块号
     rootFCB.length = 1;     //长度
     FAT1[5].item=FCB_BLOCK;
@@ -114,7 +115,7 @@ void showFCB(int blocknum,int num_in_block){
     printf("*****block %d offset %d*****\n",blocknum,num_in_block);
     printf("%s type %d\nused %d\ncreate time %d\n\
 modify time %d\nblocknum %d\nlength %d\n",
-fcb.name,fcb.type,fcb.use,fcb.creatime,fcb.moditime,fcb.base,fcb.length);
+fcb.name,fcb.type,fcb.use,fcb.time,fcb.date,fcb.base,fcb.length);
 }
 
 char *getPwd(){
@@ -122,6 +123,11 @@ char *getPwd(){
 }
 
 int my_mkdir(char *dirname){
+//判断文件名长度
+    if(strlen(dirname)>FILE_NAME_LEN){
+        printf("mkdir: cannot create directory ‘%s’: file name must less than %d bytes\n",dirname,FILE_NAME_LEN);
+        return -1;
+    }
 //检查是否重名
     if(findFCBInBlockByName(dirname,presentFCB.base)>0){
         printf("mkdir: cannot create directory ‘%s’: File exists\n",dirname);
@@ -144,8 +150,8 @@ int my_mkdir(char *dirname){
     strcpy(fcb.name,dirname);
     fcb.type=1;
     fcb.use=USED;
-    fcb.creatime=2018;
-    fcb.moditime=2018;
+    fcb.time=2018;
+    fcb.date=2018;
     fcb.base=blocknum;
     fcb.length=1;
     initFCBBlock(blocknum,presentFCB.base);

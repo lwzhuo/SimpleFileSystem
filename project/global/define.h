@@ -12,6 +12,7 @@
     #define FAT2_LOCATON BLOCK_SIZE*3
     #define DATA_LOCATION BLOCK_SIZE*6
     #define ROOT_FCB_LOCATION 5
+    #define FILE_NAME_LEN 11
     #define FREE 0
     #define USED 1
     #define END_OF_FILE 65535
