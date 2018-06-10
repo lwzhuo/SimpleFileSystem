@@ -38,6 +38,8 @@ typedef struct useropen{
     int count;//文件指针的位置
     unsigned fcbstate:1;//标志fcb是否被修改 1-已修改 0-未修改
     unsigned topenfile:1;//标志使用状态 1-已使用(USED) 0-未使用(FREE)
+    int blocknum;//所在块号
+    int offset_in_block;//所在块号偏移量
 }useropen;
 #endif
 
