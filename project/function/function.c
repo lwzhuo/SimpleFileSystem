@@ -296,7 +296,7 @@ int my_rm(char *filename){
 int my_open(char *filename){
     int fd;
     fd = findfdByNameAndDir(filename,pwd);
-    if(fd>0){//判断是否已经打开
+    if(fd>=0){//判断是否已经打开
         printf("open: cannot open file ‘%s’: %s is already open\n",filename,filename);
         return -1;
     }
@@ -316,7 +316,7 @@ int my_open(char *filename){
             strcpy(uopenlist[fd].dir,pwd);
             uopenlist[fd].count = 0;
             uopenlist[fd].fcbstate = 0;
-            uopenlist[fd].topenfile = 1;
+            uopenlist[fd].topenfile = USED;
             return 0;
         }
     }
