@@ -82,6 +82,28 @@ int doOpration(int argc,char ** argv){
         }  
     }
 
+    if(strcmp(argv[0],"create")==0){
+        if(argc!=2){
+            printf("usage %s [file name]\n",argv[0]);
+            return -1;
+        }
+        else{
+            my_create(argv[1]);
+            return 0;
+        }  
+    }
+
+    if(strcmp(argv[0],"rm")==0){
+        if(argc!=2){
+            printf("usage %s [file name]\n",argv[0]);
+            return -1;
+        }
+        else{
+            my_rm(argv[1]);
+            return 0;
+        }  
+    }
+
     printf("%s: command not found\n",argv[0]);
     return 0;
 }
