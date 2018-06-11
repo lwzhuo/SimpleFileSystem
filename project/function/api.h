@@ -8,7 +8,7 @@
     void showfdList();
     int my_cd(char *dirname);
     int my_mkdir(char *dirname);
-    void my_rmdir(char *dirname);
+    int my_rmdir(char *dirname);
     void my_ls();
     int my_create(char *filename);
     int my_rm(char *filename);

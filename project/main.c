@@ -5,7 +5,6 @@
 #include"shell/shell.h"
 char sysname[20]="mydisk";
 char pwd[80];
-int presentFCBblocknum;
 FILE * DISK;
 BLOCK0 block0;
 FATitem FAT1[FAT_ITEM_NUM];

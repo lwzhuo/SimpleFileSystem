@@ -82,7 +82,6 @@ void startsys(){//初始化文件系统
     }
 //进行其他初始化操作
     strcpy(pwd,"/");//设置当前目录
-    presentFCBblocknum = 5;//设置当前的FCB盘块号
     getFCB(&presentFCB,5,0);//将根目录设置成当前内存中的FCB
     getFAT(FAT1,FAT1_LOCATON);//加载FAT1
     getFAT(FAT2,FAT2_LOCATON);//加载FAT2
@@ -165,24 +164,46 @@ int my_mkdir(char *dirname){
     rewriteFAT();
 }
 
-// void my_rmdir(char *dirname){
-// //检查是否有这个目录
-//     int offset;
-//     FCB fcb;
-//     if((offset=findFCBInBlockByName(dirname,presentFCBblocknum))<0){
-//         printf("rm: cannot remove '%s': No such file or directory",dirname);
-//         return -1;
-//     }else{
-//     // 清空这个FCB指向的盘块
-//         getFCB(&fcb,presentFCB,offset);
-//         FAT1[fcb.base].item=FREE;
-//         FAT2[fcb.base].item=FREE;
-//         rewriteFAT();
-//     //删除这个FCB
-//         removeFCB(presentFCBblocknum,offset);
-    
-//     }
-// }
+int my_rmdir(char *dirname){
+//检查是否有这个目录
+    int offset;
+    FCB fcb;//将要删除的FCB
+    if((offset=findFCBInBlockByName(dirname,presentFCB.base))<0){
+        printf("rmdir: cannot remove '%s': No such file or directory\n",dirname);
+        return -1;
+    }else{
+// 清空这个FCB指向的盘块
+        getFCB(&fcb,presentFCB.base,offset);
+    //判断是否为目录类型
+        if(fcb.type!=1){
+            printf("rmdir: cannot remove '%s': Is a file, please use rm\n",dirname);
+            return -1;
+        }
+    //判断是否删除的是 .或 ..目录
+        if(strcmp(fcb.name,".")==0||strcmp(fcb.name,"..")==0){
+            printf("rmdir: refusing to remove '.' or '..'\n");
+            return -1;
+        }
+    //判断这个目录是否为空
+        for(int i=0;i<FCB_ITEM_NUM;i++){
+            FCB f;
+            getFCB(&f,fcb.base,i);
+            if(f.use==USED){
+                if(strcmp(f.name,".")!=0&&strcmp(f.name,"..")!=0){
+                    printf("rmdir: cannot remove '%s': %s not empty\n",dirname,dirname);
+                    return -1;
+                }
+            }
+        }
+    //修改FAT
+        FAT1[fcb.base].item=FREE;
+        FAT2[fcb.base].item=FREE;
+        rewriteFAT();
+    //删除这个FCB
+        removeFCB(presentFCB.base,offset);
+        return 0;
+    }
+}
 
 void my_ls(){
     int blocknum = presentFCB.base;//获得当前fcb所在的盘块号
@@ -210,7 +231,6 @@ int my_cd(char *dirname){
             printf("cd: %s: Not a directory\n",dirname);
             return -1;
         }
-        presentFCBblocknum = presentFCB.base;//修改当前fcb所在的盘块号
         presentFCB=fcb;//修改当前fcb值
         if(strcmp(dirname,".")==0)//当前目录
             ;
@@ -281,9 +301,14 @@ int my_rm(char *filename){
         printf("rm: cannot remove '%s': No such file\n",filename);
         return -1;
     }else{
-    //修改FAT
         FCB fcb;
         getFCB(&fcb,presentFCB.base,offset);
+    //判断文件类型
+        if(fcb.type==1){
+            printf("rm: cannot remove '%s': Is a directory\n",filename);
+        return -1;
+        }
+    //修改FAT
         FAT1[fcb.base].item=FREE;
         FAT2[fcb.base].item=FREE;
         rewriteFAT();

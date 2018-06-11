@@ -8,6 +8,5 @@
     extern FCB presentFCB;
     extern FATitem FAT1 [];
     extern FATitem FAT2 [];
-    extern int presentFCBblocknum;
     extern useropen uopenlist[];
 #endif

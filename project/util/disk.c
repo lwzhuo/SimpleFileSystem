@@ -142,6 +142,17 @@ int getFCBList(int blocknum,FCBList FLstruct,lslink *fcblisthead){
     }
 }
 
+int getFCBNum(int blocknum){
+    int num=0;
+    FCB fcblist[FCB_ITEM_NUM];
+    readFromDisk(DISK,&fcblist,sizeof(FCB)*FCB_ITEM_NUM,blocknum*BLOCK_SIZE,0);
+    for(int i=0;i<FCB_ITEM_NUM;i++){
+        if(fcblist[i].use==USED)
+            num++;
+    }
+    return num;
+}
+
 int getEmptyBlockId(){
     int flag=0;
     for(int i=0;i<FAT_ITEM_NUM;i++){

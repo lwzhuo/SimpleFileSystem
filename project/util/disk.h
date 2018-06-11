@@ -17,6 +17,7 @@ int findFCBInBlockByName(char *name,int blocknum);
 int getEmptyFCBOffset(int blocknum);
 int getFCB(FCB *fcb,int blocknum,int offset_in_block);
 int getFCBList(int blocknum,FCBList FLstruct,lslink *fcblisthead);
+int getFCBNum(int blocknum);
 int getEmptyBlockId();
 int getOpenNum();
 int getEmptyfd();

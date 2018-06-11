@@ -127,6 +127,17 @@ int doOpration(int argc,char ** argv){
         }  
     }
 
+    if(strcmp(argv[0],"rmdir")==0){
+        if(argc!=2){
+            printf("usage %s [directory name]\n",argv[0]);
+            return -1;
+        }
+        else{
+            my_rmdir(argv[1]);
+            return 0;
+        }  
+    }
+
     if(strcmp(argv[0],"open")==0){
         if(argc!=2){
             printf("usage %s [file name]\n",argv[0]);
