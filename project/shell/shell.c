@@ -19,7 +19,8 @@ char ** getInstruction(int *argc){
     for(int i=0;i<10;i++)
         Ins[i] = (char *)malloc(sizeof(char)*10);
     printf("%s",header());
-    gets(buff);
+    fgets(buff,100,stdin);
+    buff[strlen(buff)-1]='\0';
     buff = trim(buff);
     Ins = split(buff," ",argc);
     return Ins;
