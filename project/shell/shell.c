@@ -155,6 +155,54 @@ int doOpration(int argc,char ** argv){
         }  
     }
 
+    if(strcmp(argv[0],"write")==0){
+        if(argc!=3){
+            printf("usage %s [fd] [write method]\n",argv[0]);
+            return -1;
+        }
+        else{
+            int a1,len;
+            char a2;
+            //printf("a1%s a2%s\n",argv[1],argv[2]);
+            a1 = atoi(argv[1]);
+            a2 = argv[2][0];
+            if((strcmp(argv[1],"0")&&a1==0)){
+                printf("usage %s [fd] [write method]\n",argv[0]);
+                return -1;
+            }
+            if(strlen(argv[1])!=1){
+                printf("usage %s [fd] [write method]\n",argv[0]);
+                return -1;
+            }
+            if(my_write(a1,&len,a2)==0){
+                printf("succeed write to fd %d with %d bytes\n",a1,len);
+                return 0;
+            }else{
+                printf("failure\n");
+                return -1;
+            }
+            return 0;
+        }  
+    }
+
+    if(strcmp(argv[0],"read")==0){
+        if(argc!=2){
+            printf("usage %s [fd num]\n",argv[0]);
+            return -1;
+        }
+        else{
+            int a,len;
+            a = atoi(argv[1]);
+            if(strcmp(argv[1],"0")&&a==0){
+                printf("usage %s [fd num]\n",argv[0]);
+                return -1;
+            }
+            if(my_read(a,&len)==0)
+                printf("read fd %d with %d bytes\n",a,len);
+            return 0;
+        }  
+    }
+
     if(strcmp(argv[0],"block0")==0){
          if(argc>1){
             printf("%s : too many arguments\n",argv[0]);

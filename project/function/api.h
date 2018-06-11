@@ -14,10 +14,8 @@
     int my_rm(char *filename);
     int my_open(char *filename);
     void my_close(int fd);
-    int my_write(int fd);
-    int do_write(int fd,char *text,int len,char wstyle);
-    int my_read(int fd,int len);
-    int do_read(int fd,int len,char *text);
+    int my_write(int fd,int *len,char wstyle);
+    int my_read(int fd,int *len);
     char *getPwd();
     void exitsys();
 #endif

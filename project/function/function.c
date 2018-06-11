@@ -340,6 +340,74 @@ int my_close(int fd){
     }
 }
 
+//wstyle w-截断写 a-追加写 c-覆盖写
+int my_write(int fd,int *sumlen,char wstyle){
+    if(fd>=MAX_FD_NUM||fd<0){
+        printf("close: invalid fd\n");
+        return -1;
+    }else{
+        if(uopenlist[fd].topenfile==FREE){//判断是否已经关闭
+            printf("write: cannot write to fd ‘%d’: fd %d is already close\n",fd,fd);
+            return -1;
+        }else{
+            char str[BLOCK_SIZE],buff[BLOCK_SIZE];
+            int blocknum = uopenlist[fd].fcb.base;
+            int len;
+            *sumlen=0;
+            memset(str,0,BLOCK_SIZE);
+            memset(buff,0,BLOCK_SIZE);
+            if(wstyle=='w'){//截断写
+            //循环读取直到EOF 每次最多读取一个盘块大小的内容 多余部分留在缓冲区作为下次读取
+                while(fgets(str,BLOCK_SIZE,stdin)!=NULL){
+                    len = strlen(str);//记录实际读取到的长度
+                    if(*sumlen+len<BLOCK_SIZE){//长度小于一个盘块
+                        *sumlen+=len;
+                        strcat(buff,str);
+                    }else{//长度大于一个盘块
+                        writeToDisk(DISK,buff,BLOCK_SIZE,blocknum*BLOCK_SIZE,0);//先把之前整个盘块的内容存放起来
+                        *sumlen+=len;
+                        memset(buff,0,BLOCK_SIZE);//重新初始化 清空原有数据
+                        len=0;
+                        strcat(buff,str);
+                    }
+                }
+                writeToDisk(DISK,buff,BLOCK_SIZE,blocknum*BLOCK_SIZE,0);
+                uopenlist[fd].count=*sumlen;
+                return 0;
+            }else if(wstyle=='a'){
+
+            }else if(wstyle=='c'){
+
+            }else{
+                printf("write: invalid write type ‘%c’\n",wstyle);
+                return -1;
+            }
+        } 
+    }
+}
+
+int my_read(int fd,int *sumlen){
+    if(fd>=MAX_FD_NUM||fd<0){
+        printf("read: invalid fd\n");
+        return -1;
+    }else{
+        if(uopenlist[fd].topenfile==FREE){//判断是否已经关闭
+            printf("read: cannot read to fd ‘%d’: fd %d is already close\n",fd,fd);
+            return -1;
+        }else{
+            char str[BLOCK_SIZE],buff[BLOCK_SIZE];
+            int blocknum = uopenlist[fd].fcb.base;
+            int len;
+            *sumlen=0;
+            memset(str,0,BLOCK_SIZE);
+            memset(buff,0,BLOCK_SIZE);
+            readFromDisk(DISK,&buff,BLOCK_SIZE,blocknum*BLOCK_SIZE,0);
+            fputs(buff,stdout);
+            return 0;
+        }
+    }
+}
+
 void showfdList(){
     int num=0;
     for(int i=0;i<MAX_FD_NUM;i++){
