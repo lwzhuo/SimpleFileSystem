@@ -350,6 +350,10 @@ int my_write(int fd,int *sumlen,char wstyle){
             printf("write: cannot write to fd ‘%d’: fd %d is already close\n",fd,fd);
             return -1;
         }else{
+            if(uopenlist[fd].fcb.type==1){//判断如果是目录
+                printf("write: cannot write to fd ‘%d’: fd %d is a directory\n",fd,fd);
+                return -1;
+            }
             char str[BLOCK_SIZE],buff[BLOCK_SIZE];
             int blocknum = uopenlist[fd].fcb.base;
             int len;
@@ -395,6 +399,10 @@ int my_read(int fd,int *sumlen){
             printf("read: cannot read to fd ‘%d’: fd %d is already close\n",fd,fd);
             return -1;
         }else{
+            if(uopenlist[fd].fcb.type==1){//判断如果是目录
+                printf("read: cannot read to fd ‘%d’: fd %d is a directory\n",fd,fd);
+                return -1;
+            }
             char str[BLOCK_SIZE],buff[BLOCK_SIZE];
             int blocknum = uopenlist[fd].fcb.base;
             int len;

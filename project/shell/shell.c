@@ -177,9 +177,6 @@ int doOpration(int argc,char ** argv){
             if(my_write(a1,&len,a2)==0){
                 printf("succeed write to fd %d with %d bytes\n",a1,len);
                 return 0;
-            }else{
-                printf("failure\n");
-                return -1;
             }
             return 0;
         }  
