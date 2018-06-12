@@ -99,9 +99,13 @@ void showBlock0(){
     b0.identify,b0.info,b0.root,b0.startblock,b0.rootFCB);
 }
 
-void showFAT(){
+int showFAT(int start,int end){
     getFAT(FAT1,FAT1_LOCATON);
-    for(int i=0,j=1;i<FAT_ITEM_NUM;i++,j++){
+    if(start>end||start<0||end>FAT_ITEM_NUM){
+        printf("fat:invalid num\n");
+        return -1;
+    }
+    for(int i=start,j=1;i<end;i++,j++){
          printf("item %d:%d",i,FAT1[i].item);
          if(j%10==0)
             printf("\n");
@@ -109,6 +113,7 @@ void showFAT(){
             printf("\t");
     }
     printf("\n");
+    return 0;
 }
 
 void showFCB(int blocknum,int num_in_block){

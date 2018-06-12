@@ -233,12 +233,20 @@ int doOpration(int argc,char ** argv){
     }
 
     if(strcmp(argv[0],"fat")==0){
-         if(argc>1){
-            printf("%s : too many arguments\n",argv[0]);
+         if(argc!=3){
+            printf("usage %s [blocknum start][blocknum end]\n",argv[0]);
             return -1;
         }
         else{
-            showFAT();
+            int a1,a2;
+            //printf("a1%s a2%s\n",argv[1],argv[2]);
+            a1 = atoi(argv[1]);
+            a2 = atoi(argv[2]);
+            if((strcmp(argv[1],"0")&&a1==0)||(strcmp(argv[2],"0")&&a2==0)){
+                printf("usage %s [blocknum start][blocknum end]\n",argv[0]);
+                return -1;
+            }
+            showFAT(a1,a2);
             return 0;
         }
     }

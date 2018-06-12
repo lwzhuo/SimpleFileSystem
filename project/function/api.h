@@ -3,7 +3,7 @@
     void startsys();
     void format();
     void showBlock0();
-    void showFAT();
+    void showFAT(int start,int end);
     void showFCB(int blocknum,int num_in_block);
     void showPresentFCB();
     void showfdList();
