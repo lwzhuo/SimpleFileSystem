@@ -182,7 +182,7 @@ int doOpration(int argc,char ** argv){
             return -1;
         }
         else{
-            int a1,len;
+            int a1,len=0;
             char a2;
             //printf("a1%s a2%s\n",argv[1],argv[2]);
             a1 = atoi(argv[1]);
@@ -209,7 +209,7 @@ int doOpration(int argc,char ** argv){
             return -1;
         }
         else{
-            int a,len;
+            int a,len=0;
             a = atoi(argv[1]);
             if(strcmp(argv[1],"0")&&a==0){
                 printf("usage %s [fd num]\n",argv[0]);

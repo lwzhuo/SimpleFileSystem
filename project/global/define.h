@@ -16,7 +16,7 @@
     #define MAX_FD_NUM 10
     #define FREE 0
     #define USED 1
-    #define END_OF_FILE 65535
+    #define END_OF_FILE -1
     #define OK 0
     #define ERROR -1
 #endif

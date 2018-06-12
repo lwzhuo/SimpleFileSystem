@@ -100,8 +100,8 @@ int findFCBInBlockByName(char *name,int blocknum){
     return offset;
 }
 
-int changeFCB(FCB newfcb,int blocknum,int offset_in_block){
-    writeToDisk(DISK,&newfcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*FCB_SIZE);
+int changeFCB(FCB fcb,int blocknum,int offset_in_block){
+    writeToDisk(DISK,&fcb,sizeof(FCB),blocknum*BLOCK_SIZE,offset_in_block*FCB_SIZE);
     return 0;
 }
 
@@ -195,4 +195,28 @@ int findfdByNameAndDir(char *filename,char *dirname){
             }
         }  
     return fd;
+}
+
+int getNextBlocknum(int blocknum){
+    return FAT1[blocknum].item;
+}
+
+blockchain* getBlockChain(int blocknum){
+    int num = FAT1[blocknum].item;
+    blockchain *blc,*first;
+    blc = get_node(struct blockchain);
+    first = get_node(struct blockchain);
+    first->blocknum = blocknum;
+    list_init(&(blc->link),blc);
+    list_insert(&(blc->link),&(first->link),blc);
+    if(num==1||num==2||num==-1)//磁盘信息块或者是FCB块掠过
+        return blc;
+    while(num!=-1){
+        num = FAT1[num].item;
+        blockchain *temp;
+        temp = get_node(struct blockchain);
+        temp->blocknum = num;
+        list_insert(&(blc->link),&(temp->link),blc);
+    }
+    return blc;
 }
