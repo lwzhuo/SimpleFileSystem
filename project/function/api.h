@@ -5,6 +5,7 @@
     void showBlock0();
     void showFAT();
     void showFCB(int blocknum,int num_in_block);
+    void showPresentFCB();
     void showfdList();
     int my_cd(char *dirname);
     int my_mkdir(char *dirname);

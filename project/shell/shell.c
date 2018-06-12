@@ -33,9 +33,19 @@ void help(){
     printf("%-10s - %s\n","mkdir","make directories");
     printf("%-10s - %s\n","cd","change working directory");
     printf("%-10s - %s\n","create","create new file");
-    printf("%-10s - %s\n","create","create new file");
-    printf("%-10s - %s\n","rm","remove files or directories");
+    printf("%-10s - %s\n","rm","remove files");    
+    printf("%-10s - %s\n","rmdir","remove directory");
     printf("%-10s - %s\n","open","open a file");
+    printf("%-10s - %s\n","close","close a file");
+    printf("%-10s - %s\n","write","write to fd");
+    printf("%-10s - %s\n","read","read from fd");
+    printf("%-10s - %s\n","opl","show open file list");
+
+    printf("******************For Developer******************\n");
+    printf("%-10s - %s\n","block0","show block0 information");
+    printf("%-10s - %s\n","fat","show fat");
+    printf("%-10s - %s\n","fcb","show a fcb information use blocknum and offset");
+    printf("%-10s - %s\n","pfcb","shwo current fcb");
 }
 int doOpration(int argc,char ** argv){
     //printf("%d **%s**\n",argc,argv[0]);
@@ -252,13 +262,24 @@ int doOpration(int argc,char ** argv){
         }  
     }
 
-     if(strcmp(argv[0],"opl")==0){
+    if(strcmp(argv[0],"opl")==0){
          if(argc>1){
             printf("%s : too many arguments\n",argv[0]);
             return -1;
         }
         else{
             showfdList();
+            return 0;
+        }
+    }
+
+    if(strcmp(argv[0],"pfcb")==0){
+         if(argc>1){
+            printf("%s : too many arguments\n",argv[0]);
+            return -1;
+        }
+        else{
+            showPresentFCB();
             return 0;
         }
     }

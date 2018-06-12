@@ -115,9 +115,16 @@ void showFCB(int blocknum,int num_in_block){
     FCB fcb;
     readFromDisk(DISK,&fcb,sizeof(fcb),blocknum*BLOCK_SIZE,num_in_block*FCB_SIZE);
     printf("*****block %d offset %d*****\n",blocknum,num_in_block);
-    printf("%s type %d\nused %d\ncreate time %d\n\
+    printf("name %s\ntype %d\nused %d\ncreate time %d\n\
 create date %d\nblocknum %d\nlength %d\n",
 fcb.name,fcb.type,fcb.use,fcb.time,fcb.date,fcb.base,fcb.length);
+}
+
+void showPresentFCB(){
+    printf("name %s\ntype %d\nused %d\ncreate time %d\n\
+create date %d\nblocknum %d\nlength %d\n",
+presentFCB.name,presentFCB.type,presentFCB.use,
+presentFCB.time,presentFCB.date,presentFCB.base,presentFCB.length);
 }
 
 char *getPwd(){
