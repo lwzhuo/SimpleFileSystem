@@ -7,6 +7,7 @@
     void showFCB(int blocknum,int num_in_block);
     void showPresentFCB();
     void showfdList();
+    void showBlockChain(int blocknum);
     int my_cd(char *dirname);
     int my_mkdir(char *dirname);
     int my_rmdir(char *dirname);

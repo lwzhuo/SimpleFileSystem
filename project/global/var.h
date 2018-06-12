@@ -41,5 +41,11 @@ typedef struct useropen{
     int blocknum;//所在块号
     int offset_in_block;//所在块号偏移量
 }useropen;
+
+//盘块链
+typedef struct blockchain{
+    signed short blocknum:16;
+    lslink link;
+}blockchain;
 #endif
 

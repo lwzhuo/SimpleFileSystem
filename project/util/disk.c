@@ -202,21 +202,22 @@ int getNextBlocknum(int blocknum){
 }
 
 blockchain* getBlockChain(int blocknum){
-    int num = FAT1[blocknum].item;
+    int num = blocknum;
     blockchain *blc,*first;
     blc = get_node(struct blockchain);
-    first = get_node(struct blockchain);
-    first->blocknum = blocknum;
     list_init(&(blc->link),blc);
-    list_insert(&(blc->link),&(first->link),blc);
-    if(num==1||num==2||num==-1)//磁盘信息块或者是FCB块掠过
-        return blc;
+    if(num==1||num==2||num==-1){//磁盘信息块或者是FCB块掠过
+        first = get_node(struct blockchain);
+        first->blocknum = blocknum;
+        list_insert(&(blc->link),&(first->link),blc);
+       return blc;
+    }
     while(num!=-1){
-        num = FAT1[num].item;
         blockchain *temp;
         temp = get_node(struct blockchain);
         temp->blocknum = num;
         list_insert(&(blc->link),&(temp->link),blc);
+        num = FAT1[num].item;
     }
     return blc;
 }

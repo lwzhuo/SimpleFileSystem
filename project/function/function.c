@@ -136,6 +136,20 @@ char *getPwd(){
     return pwd;
 }
 
+void showBlockChain(int blocknum){
+    blockchain *blc;
+    lslink *temp;
+    blc = getBlockChain(blocknum);
+    list_for_each(temp,&(blc->link)){
+        blockchain *b = list_entry(temp,struct blockchain,link);
+        if(b->link.next!=&(blc->link))
+            printf("%d-",b->blocknum);
+        else
+            printf("%d",b->blocknum);
+    }
+    printf("\n");
+}
+
 int my_mkdir(char *dirname){
 //判断文件名长度
     if(strlen(dirname)>FILE_NAME_LEN){
@@ -318,6 +332,14 @@ int my_rm(char *filename){
         return -1;
         }
     //修改FAT
+        blockchain *blc;
+        lslink *temp;
+        blc = getBlockChain(fcb.base);
+        list_for_each(temp,&(blc->link)){
+            blockchain *b = list_entry(temp,struct blockchain,link);
+            FAT1[b->blocknum].item=FREE;
+            FAT2[b->blocknum].item=FREE;
+        }
         FAT1[fcb.base].item=FREE;
         FAT2[fcb.base].item=FREE;
         rewriteFAT();

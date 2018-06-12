@@ -292,6 +292,22 @@ int doOpration(int argc,char ** argv){
         }
     }
 
+    if(strcmp(argv[0],"sbl")==0){
+        if(argc!=2){
+            printf("usage %s [blocknum]\n",argv[0]);
+            return -1;
+        }
+        else{
+            int a;
+            a = atoi(argv[1]);
+            if(strcmp(argv[1],"0")&&a==0){
+                printf("usage %s [blocknum]\n",argv[0]);
+                return -1;
+            }
+            showBlockChain(a);
+            return 0;
+        }  
+    }
     printf("%s: command not found\n",argv[0]);
     return 0;
 }

@@ -22,4 +22,6 @@ int getEmptyBlockId();
 int getOpenNum();
 int getEmptyfd();
 int findfdByNameAndDir(char *filename,char *dirname);
+int getNextBlocknum(int blocknum);
+blockchain* getBlockChain(int blocknum);
 #endif
