@@ -377,7 +377,7 @@ int my_open(char *filename){
             getFCB(&fcb,presentFCB.base,offset);
             uopenlist[fd].fcb = fcb;
             strcpy(uopenlist[fd].dir,pwd);
-            uopenlist[fd].count = 0;
+            uopenlist[fd].count = BLOCK_SIZE*fcb.base+0;
             uopenlist[fd].fcbstate = 0;
             uopenlist[fd].topenfile = USED;
             uopenlist[fd].blocknum = presentFCB.base;
@@ -418,24 +418,38 @@ int my_write(int fd,int *sumlen,char wstyle){
                 return -1;
             }
             char str[BLOCK_SIZE],buff[BLOCK_SIZE];
-            int blocknum = uopenlist[fd].fcb.base,nextblocknum;
-            int len,bloffset=0;//len-一次读取的长度 bloffset-文件指针块内偏移量
+            int blocknum,nextblocknum;
+            int len,bloffset;//len-一次读取的长度 bloffset-文件指针块内偏移量
             *sumlen=0;//sumlen-总长(所有输入长度之和)
             memset(str,0,BLOCK_SIZE);
             memset(buff,0,BLOCK_SIZE);
-        //截断写
+        //截断写 将文件长度截断成0写
             if(wstyle=='w'){
+                bloffset = 0;
+                blocknum = uopenlist[fd].fcb.base;
+            //做截断处理
+                if(FAT1[blocknum].item!=END_OF_FILE){
+                    blockchain *blc = getBlockChain(blocknum);
+                    lslink *temp;
+                    list_for_each(temp,&(blc->link)){
+                        blockchain *b = list_entry(temp,struct blockchain,link);
+                    //清空对应FAT块
+                        FAT1[b->blocknum].item=FREE;
+                        FAT2[b->blocknum].item=FREE;
+                        uopenlist[fd].fcb.length=0;
+                    }
+                }
             //循环读取直到EOF 每次最多读取一个盘块大小的内容 多余部分留在缓冲区作为下次读取
                 while(fgets(str,BLOCK_SIZE,stdin)!=NULL){
-                    len = strlen(str);//记录实际读取到的长度快
+                    len = strlen(str);//记录实际读取到的长度
                     //printf("len %d\n",len);
                     if(bloffset+len<BLOCK_SIZE){
-                    //文件指针块内偏移量和将要输入的长度之和小于一个盘块--不停地输入到缓冲区中
+                //文件指针块内偏移量和将要输入的长度之和小于一个盘块--不停地输入到缓冲区中
                         *sumlen+=len;
                         bloffset+=len;
                         strcat(buff,str);
                     }else{
-                    //长度大于一个盘块
+                //长度大于一个盘块
                         int lastlen=BLOCK_SIZE-bloffset-1;//要留出一位给\0作为结尾标志!!!!!!重要
                         int leavelen=len-lastlen;//计算剩下的长度
                         strncat(buff,str,lastlen);//填满上一个块
@@ -446,16 +460,16 @@ int my_write(int fd,int *sumlen,char wstyle){
                         bloffset = leavelen;
                     //将剩下部分输入缓冲区
                         strcat(buff,str+lastlen);
-                    //开辟一个新的盘块
+                    //获得一个新的盘块
                         nextblocknum = getEmptyBlockId();
-                        //标记使用状态
-                        FAT1[nextblocknum].item=USED;
-                        FAT2[nextblocknum].item=USED;
-                        printf("**********nextbln %d\n",nextblocknum);
-                        if(nextblocknum<0){//空间不足
+                    //判断空间是否充足  
+                        if(nextblocknum<0){
                             printf("write: cannot write to fd ‘%d’: lack of space\n",fd);
                             return -1;
                         }
+                    //标记使用状态(重要！！！)
+                        FAT1[nextblocknum].item=END_OF_FILE;
+                        FAT2[nextblocknum].item=END_OF_FILE;
                     //修改FAT
                         FAT1[blocknum].item=nextblocknum;
                         FAT2[blocknum].item=nextblocknum;
@@ -465,13 +479,15 @@ int my_write(int fd,int *sumlen,char wstyle){
                 writeToDisk(DISK,buff,BLOCK_SIZE,blocknum*BLOCK_SIZE,0);
                 uopenlist[fd].count=BLOCK_SIZE*blocknum+bloffset;
                 uopenlist[fd].fcb.length = *sumlen;
-            //文件结尾
+            //修改对应FCB
+                changeFCB(uopenlist[fd].fcb,uopenlist[fd].blocknum,uopenlist[fd].offset_in_block);
+            //设置文件结尾
                 FAT1[blocknum].item=END_OF_FILE;
                 FAT2[blocknum].item=END_OF_FILE;
                 rewriteFAT();
                 return 0;
             }else if(wstyle=='a'){
-            //追加写
+        //追加写
                 //循环读取直到EOF 每次最多读取一个盘块大小的内容 多余部分留在缓冲区作为下次读取
                 while(fgets(str,BLOCK_SIZE,stdin)!=NULL){
                     len = strlen(str);//记录实际读取到的长度
@@ -491,8 +507,53 @@ int my_write(int fd,int *sumlen,char wstyle){
                 uopenlist[fd].fcb.length = *sumlen;
                 return 0;
             }else if(wstyle=='c'){
-            //覆盖写
-
+        //覆盖写 在当前指针后继续写
+                bloffset=uopenlist[fd].count%BLOCK_SIZE;//计算块内偏移量
+                blocknum=uopenlist[fd].count/BLOCK_SIZE;//计算块号
+                //循环读取直到EOF 每次最多读取一个盘块大小的内容 多余部分留在缓冲区作为下次读取
+                while(fgets(str,BLOCK_SIZE,stdin)!=NULL){
+                    len = strlen(str);//记录实际读取到的长度
+                    if(bloffset+len<BLOCK_SIZE){
+                    //文件指针块内偏移量和将要输入的长度之和小于一个盘块--不停地输入到缓冲区中
+                        *sumlen+=len;
+                        bloffset+=len;
+                        strcat(buff,str);
+                    }else{
+                    //长度大于一个盘块
+                        int lastlen=BLOCK_SIZE-bloffset-1;//要留出一位给\0作为结尾标志!!!!!!重要
+                        int leavelen=len-lastlen;//计算剩下的长度
+                        strncat(buff,str,lastlen);//填满上一个块
+                        writeToDisk(DISK,buff,strlen(buff),blocknum*BLOCK_SIZE,bloffset);//填满上一个盘块
+                        memset(buff,'\0',BLOCK_SIZE);//重新初始化buff 清空原有数据 准备下一次输入
+                    //修改总长度和块内指针位置
+                        *sumlen+=len;
+                        bloffset = leavelen;
+                    //将剩下部分输入缓冲区
+                        strcat(buff,str+lastlen);
+                    //获得一个新的盘块
+                        nextblocknum = getEmptyBlockId();
+                    //判断空间是否充足  
+                        if(nextblocknum<0){
+                            printf("write: cannot write to fd ‘%d’: lack of space\n",fd);
+                            return -1;
+                        }
+                    //标记使用状态(重要！！！)
+                        FAT1[nextblocknum].item=END_OF_FILE;
+                        FAT2[nextblocknum].item=END_OF_FILE;
+                    //修改FAT
+                        FAT1[blocknum].item=nextblocknum;
+                        FAT2[blocknum].item=nextblocknum;
+                        blocknum = nextblocknum;//修改当前块号
+                    }
+                }
+                writeToDisk(DISK,buff,strlen(buff),blocknum*BLOCK_SIZE,bloffset-len);
+                uopenlist[fd].count=BLOCK_SIZE*blocknum+bloffset;
+                uopenlist[fd].fcb.length = *sumlen;
+            //文件结尾
+                FAT1[blocknum].item=END_OF_FILE;
+                FAT2[blocknum].item=END_OF_FILE;
+                rewriteFAT();
+                return 0;
             }else{
                 printf("write: invalid write type ‘%c’\n",wstyle);
                 return -1;
