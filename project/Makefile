@@ -1,7 +1,7 @@
 OUTDIR=./out
 
-fs:main.o function.o disk.o list.o shell.o str.o
-	cc -o fs $(OUTDIR)/main.o $(OUTDIR)/function.o $(OUTDIR)/disk.o $(OUTDIR)/list.o $(OUTDIR)/shell.o $(OUTDIR)/str.o
+fs:main.o function.o disk.o list.o shell.o str.o time.o
+	cc -o fs $(OUTDIR)/main.o $(OUTDIR)/function.o $(OUTDIR)/disk.o $(OUTDIR)/list.o $(OUTDIR)/shell.o $(OUTDIR)/str.o $(OUTDIR)/time.o
 
 main.o:main.c ./function/api.h ./shell/shell.h
 	cc -c main.c 
@@ -26,6 +26,10 @@ shell.o:./shell/shell.c ./shell/shell.h
 str.o:./util/str.c ./util/str.h
 	cc -c ./util/str.c
 	mv str.o $(OUTDIR)/str.o
+
+time.o:./util/time.c ./util/time.h
+	cc -c ./util/time.c
+	mv time.o $(OUTDIR)/time.o
 .PHONY:clean
 clean:
 	-rm $(OUTDIR)/main.o $(OUTDIR)/function.o $(OUTDIR)/disk.o $(OUTDIR)/list.o $(OUTDIR)/shell.o $(OUTDIR)/str.o

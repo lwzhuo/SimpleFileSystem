@@ -9,4 +9,5 @@
     extern FATitem FAT1 [];
     extern FATitem FAT2 [];
     extern useropen uopenlist[];
+    extern char * type[];
 #endif

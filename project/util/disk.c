@@ -3,6 +3,7 @@
 #include"disk.h"
 #include"../global/global.h"
 #include"list.h"
+#include"time.h"
 void createDisk(){
     char buff[BLOCK_SIZE]={'0'};
     FILE *f = fopen(sysname,"r+");
@@ -56,12 +57,13 @@ int initFCBBlock(int blocknum,int parentblocknum){
     rewriteFAT();
 //加入.和..目录
 //.目录
+    struct tm *t=getTimeStruct();
     FCB fcb;
     strcpy(fcb.name,".");
     fcb.type=1;
     fcb.use=USED;
-    fcb.time=2018;
-    fcb.date=2018;
+    fcb.time=gettime(t);
+    fcb.date=getdate(t);
     fcb.base=blocknum;//指向当前目录
     fcb.length=1;
     addFCB(fcb,blocknum);
@@ -69,8 +71,8 @@ int initFCBBlock(int blocknum,int parentblocknum){
     strcpy(fcb.name,"..");
     fcb.type=1;
     fcb.use=USED;
-    fcb.time=2018;
-    fcb.date=2018;
+    fcb.time=gettime(t);
+    fcb.date=getdate(t);
     fcb.base=parentblocknum;//指向父目录
     fcb.length=1;
     addFCB(fcb,blocknum);

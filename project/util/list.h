@@ -6,7 +6,7 @@
 //以下是其结构
 typedef struct lslink lslink;
 typedef struct lslink{
-    void * sptr;
+    void * sptr;//用来存放包含lslink的结构的首地址 方便销毁链表
     lslink *next;
     lslink *prev;
 }lslink;

@@ -6,6 +6,7 @@
 #include<sys/stat.h>
 #include<unistd.h>
 #include"../util/disk.h"
+#include"../util/time.h"
 #include"../global/global.h"
 #include"../global/define.h"
 void format(){//文件系统格式化
@@ -25,12 +26,13 @@ void format(){//文件系统格式化
     fwrite(fat,sizeof(FATitem),BLOCK_NUMS*2,DISK);
     free(fat);
 //根目录区 存放在5号盘块
+    struct tm *t=getTimeStruct();
     FCB rootFCB;
     strcpy(rootFCB.name,"/");
     rootFCB.type = 1;       //类型-目录
     rootFCB.use = USED;        //已使用
-    rootFCB.time = 0;
-    rootFCB.date = 0;
+    rootFCB.time = gettime(t);
+    rootFCB.date = getdate(t);
     rootFCB.base = 6;       //起始盘块号
     rootFCB.length = 1;     //长度
     FAT1[5].item=FCB_BLOCK;
@@ -182,11 +184,12 @@ int my_mkdir(char *dirname){
         return -1;
     }
 //构造FCB
+    struct tm *t=getTimeStruct();
     strcpy(fcb.name,dirname);
     fcb.type=1;
     fcb.use=USED;
-    fcb.time=2018;
-    fcb.date=2018;
+    fcb.time=gettime(t);
+    fcb.date=getdate(t);
     fcb.base=blocknum;
     fcb.length=1;
     initFCBBlock(blocknum,presentFCB.base);
@@ -242,10 +245,13 @@ void my_ls(){
     FCBlisthead = &(FL.link);
 
     printf("directory %s\n",pwd);
+    printf("%-12s %-10s %-8s %-6s\n","name","type","time","length(bytes)");
     getFCBList(blocknum,FL,FCBlisthead);
     list_for_each(temp,FCBlisthead){
         Fnode = list_entry(temp,FCBList,link);
-        printf("%-12s type:%d\n",Fnode->fcb_entry.name,Fnode->fcb_entry.type);
+        printf("%-12s %-10s %4d%4d %-6d\n",Fnode->fcb_entry.name,
+        type[Fnode->fcb_entry.type],Fnode->fcb_entry.date,Fnode->fcb_entry.time,
+        Fnode->fcb_entry.length);
     }
 }
 
@@ -305,12 +311,13 @@ int my_create(char *filename){
                 return -1;
             }else{
             //构建FCB
+                struct tm *t=getTimeStruct();
                 FCB fcb;
                 strcpy(fcb.name,filename);
                 fcb.type=0;
                 fcb.use=USED;
-                fcb.time=2018;
-                fcb.date=2018;
+                fcb.time=gettime(t);
+                fcb.date=getdate(t);
                 fcb.base=blocknum;
                 fcb.length=1;
                 addFCB(fcb,presentFCB.base);

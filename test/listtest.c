@@ -1,13 +1,14 @@
 #include<stdio.h>
 #include"../project/util/list.h"
+#include"../project/util/list.c"
 struct mystruct{
         int a;
         char b;
         double c;
-        link head;
+        lslink head;
     };
-void showAll(link *lhead){
-    link *ltemp;
+void showAll(lslink *lhead){
+    lslink *ltemp;
     struct mystruct *temp;
     temp = lhead->sptr;
     if(temp!=NULL)
@@ -21,7 +22,7 @@ int main()
 {
     
     struct mystruct *m,*temp;
-    link *ltemp,*lhead;
+    lslink *ltemp,*lhead;
 //构造链表
     m = get_node(struct mystruct);
     m->a=1;m->b='1';m->c=1;

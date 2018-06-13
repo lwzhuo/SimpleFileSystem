@@ -45,7 +45,9 @@ void help(){
     printf("%-10s - %s\n","block0","show block0 information");
     printf("%-10s - %s\n","fat","show fat");
     printf("%-10s - %s\n","fcb","show a fcb information use blocknum and offset");
-    printf("%-10s - %s\n","pfcb","shwo current fcb");
+    printf("%-10s - %s\n","pfcb","show current fcb");
+    printf("%-10s - %s\n","sbc","show block chain");
+    printf("%-10s - %s\n","sbd","show data in block");
 }
 int doOpration(int argc,char ** argv){
     //printf("%d **%s**\n",argc,argv[0]);
