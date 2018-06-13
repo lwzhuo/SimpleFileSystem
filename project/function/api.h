@@ -6,6 +6,7 @@
     void showFAT(int start,int end);
     void showFCB(int blocknum,int num_in_block);
     void showPresentFCB();
+    void showBlockData(int blocknum);
     void showfdList();
     void showBlockChain(int blocknum);
     int my_cd(char *dirname);

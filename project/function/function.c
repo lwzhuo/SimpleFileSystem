@@ -132,6 +132,13 @@ presentFCB.name,presentFCB.type,presentFCB.use,
 presentFCB.time,presentFCB.date,presentFCB.base,presentFCB.length);
 }
 
+void showBlockData(int blocknum){
+    char buff[BLOCK_SIZE];
+    readFromDisk(DISK,buff,BLOCK_SIZE,blocknum*BLOCK_SIZE,0);
+    fputs(buff,stdout);
+    printf("\nlen:%d bytes\n",(int)strlen(buff));
+}
+
 char *getPwd(){
     return pwd;
 }
@@ -429,8 +436,8 @@ int my_write(int fd,int *sumlen,char wstyle){
                         strcat(buff,str);
                     }else{
                     //长度大于一个盘块
-                        int lastlen=BLOCK_SIZE-bloffset;
-                        int leavelen=len-(BLOCK_SIZE-bloffset);//计算剩下的长度
+                        int lastlen=BLOCK_SIZE-bloffset-1;//要留出一位给\0作为结尾标志!!!!!!重要
+                        int leavelen=len-lastlen;//计算剩下的长度
                         strncat(buff,str,lastlen);//填满上一个块
                         writeToDisk(DISK,buff,BLOCK_SIZE,blocknum*BLOCK_SIZE,0);//先把之前整个盘块的内容存放起来
                         memset(buff,'\0',BLOCK_SIZE);//重新初始化buff 清空原有数据 准备下一次输入
@@ -441,6 +448,10 @@ int my_write(int fd,int *sumlen,char wstyle){
                         strcat(buff,str+lastlen);
                     //开辟一个新的盘块
                         nextblocknum = getEmptyBlockId();
+                        //标记使用状态
+                        FAT1[nextblocknum].item=USED;
+                        FAT2[nextblocknum].item=USED;
+                        printf("**********nextbln %d\n",nextblocknum);
                         if(nextblocknum<0){//空间不足
                             printf("write: cannot write to fd ‘%d’: lack of space\n",fd);
                             return -1;
@@ -503,16 +514,12 @@ int my_read(int fd,int *sumlen){
                 printf("read: cannot read to fd ‘%d’: fd %d is a directory\n",fd,fd);
                 return -1;
             }
-            char str[BLOCK_SIZE],buff[BLOCK_SIZE];
+            char buff[BLOCK_SIZE];
             int blocknum = uopenlist[fd].fcb.base;
-            memset(str,0,BLOCK_SIZE);
-            int i=0;
             while(blocknum!=END_OF_FILE){
-                memset(buff,0,BLOCK_SIZE);//一定要初始化！！！！！
                 readFromDisk(DISK,buff,BLOCK_SIZE,blocknum*BLOCK_SIZE,0);
                 *sumlen += strlen(buff);
                 fputs(buff,stdout);
-                memset(buff,0,BLOCK_SIZE);
                 blocknum=FAT1[blocknum].item;
             }
             return 0;
