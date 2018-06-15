@@ -148,8 +148,10 @@ char *getPwd(){
 void showBlockChain(int blocknum){
     blockchain *blc;
     lslink *temp;
+    int n=0;
     blc = getBlockChain(blocknum);
     list_for_each(temp,&(blc->link)){
+        n++;
         blockchain *b = list_entry(temp,struct blockchain,link);
         if(b->link.next!=&(blc->link))
             printf("%d-",b->blocknum);
@@ -157,6 +159,7 @@ void showBlockChain(int blocknum){
             printf("%d",b->blocknum);
     }
     printf("\n");
+    printf("%d blocks in total\n",n);
 }
 
 int my_mkdir(char *dirname){
@@ -359,6 +362,9 @@ int my_rm(char *filename){
         rewriteFAT();
     //删除FCB
         removeFCB(presentFCB.base,offset);
+        int fd = findfdByNameAndDir(filename,pwd);
+        if(fd>=0&&uopenlist[fd].topenfile==USED)
+            uopenlist[fd].topenfile=FREE;
         return 0;
     }
 }
@@ -389,6 +395,7 @@ int my_open(char *filename){
             uopenlist[fd].topenfile = USED;
             uopenlist[fd].blocknum = presentFCB.base;
             uopenlist[fd].offset_in_block = findFCBInBlockByName(filename,presentFCB.base);
+            printf("filename:%s fd:%d\n",filename,fd);
             return 0;
         }
     }
@@ -650,6 +657,117 @@ int my_read(int fd,int *sumlen){
     }
 }
 
+int my_in(int fd,char *filename,int *sumlen){
+    if(fd>=MAX_FD_NUM||fd<0){//判断fd合法性
+        printf("close: invalid fd\n");
+        return -1;
+    }else{
+        if(uopenlist[fd].topenfile==FREE){//判断是否已经关闭
+            printf("write: cannot write to fd ‘%d’: fd %d is already close\n",fd,fd);
+            return -1;
+        }else{
+            if(uopenlist[fd].fcb.type==1){//判断如果是目录
+                printf("write: cannot write to fd ‘%d’: fd %d is a directory\n",fd,fd);
+                return -1;
+            }
+            char buff[BLOCK_SIZE];
+            int blocknum,nextblocknum;
+            int len,bloffset;//len-一次读取的长度 bloffset-文件指针块内偏移量
+            FILE *f = fopen(filename,"rb");
+            if(f==NULL){
+                printf("open file %s failure\n",filename);
+                return -1;
+            }
+            *sumlen=0;//sumlen-总长(所有输入长度之和)
+            memset(buff,0,BLOCK_SIZE);
+        //截断写 将文件长度截断成0写
+            blocknum = uopenlist[fd].fcb.base;
+        //做截断处理
+            if(FAT1[blocknum].item!=END_OF_FILE){
+                blockchain *blc = getBlockChain(blocknum);
+                lslink *temp;
+                list_for_each(temp,&(blc->link)){
+                    blockchain *b = list_entry(temp,struct blockchain,link);
+                //清空对应FAT块
+                    FAT1[b->blocknum].item=FREE;
+                    FAT2[b->blocknum].item=FREE;
+                    uopenlist[fd].fcb.length=0;
+                }
+            }
+        //循环读取直到EOF 每次最多读取一个盘块大小的内容 多余部分留在缓冲区作为下次读取
+            while(!feof(f)){
+                len=fread(buff,1,BLOCK_SIZE,f);
+                if(len<BLOCK_SIZE){
+            //文件指针块内偏移量和将要输入的长度之和小于一个盘块--不停地输入到缓冲区中
+                    *sumlen+=len;
+                    writeToDisk(DISK,buff,BLOCK_SIZE,blocknum*BLOCK_SIZE,0);
+                }else{
+            //长度大于一个盘块
+                    writeToDisk(DISK,buff,BLOCK_SIZE,blocknum*BLOCK_SIZE,0);//先把之前整个盘块的内容存放起来
+                    memset(buff,'\0',BLOCK_SIZE);//重新初始化buff 清空原有数据 准备下一次输入
+                //修改总长度
+                    *sumlen+=len;
+                //获得一个新的盘块
+                    nextblocknum = getEmptyBlockId();
+                //判断空间是否充足  
+                    if(nextblocknum<0){
+                        printf("write: cannot write to fd ‘%d’: lack of space\n",fd);
+                        return -1;
+                    }
+                //标记使用状态(重要！！！)
+                    FAT1[nextblocknum].item=END_OF_FILE;
+                    FAT2[nextblocknum].item=END_OF_FILE;
+                //修改FAT
+                    FAT1[blocknum].item=nextblocknum;
+                    FAT2[blocknum].item=nextblocknum;
+                    blocknum = nextblocknum;//修改当前块号
+                }
+            }
+            uopenlist[fd].count=BLOCK_SIZE*blocknum+len;
+            uopenlist[fd].fcb.length = *sumlen;
+        //修改对应FCB
+            changeFCB(uopenlist[fd].fcb,uopenlist[fd].blocknum,uopenlist[fd].offset_in_block);
+        //设置文件结尾
+            FAT1[blocknum].item=END_OF_FILE;
+            FAT2[blocknum].item=END_OF_FILE;
+            rewriteFAT();
+            fclose(f);
+            return 0;
+        }
+    }
+}
+
+int my_out(int fd,char *filename,int *sumlen){
+    if(fd>=MAX_FD_NUM||fd<0){
+        printf("read: invalid fd\n");
+        return -1;
+    }else{
+        if(uopenlist[fd].topenfile==FREE){//判断是否已经关闭
+            printf("read: cannot read to fd ‘%d’: fd %d is already close\n",fd,fd);
+            return -1;
+        }else{
+            if(uopenlist[fd].fcb.type==1){//判断如果是目录
+                printf("read: cannot read to fd ‘%d’: fd %d is a directory\n",fd,fd);
+                return -1;
+            }
+            FILE *f = fopen(filename,"wb");
+            char buff[BLOCK_SIZE];
+            int blocknum = uopenlist[fd].fcb.base;
+            int length = uopenlist[fd].fcb.length;
+            while(FAT1[blocknum].item!=END_OF_FILE){
+                readFromDisk(DISK,buff,BLOCK_SIZE,blocknum*BLOCK_SIZE,0);
+                *sumlen += BLOCK_SIZE;
+                fwrite(buff,BLOCK_SIZE,1,f);
+                blocknum=FAT1[blocknum].item;
+            }
+            readFromDisk(DISK,buff,BLOCK_SIZE,blocknum*BLOCK_SIZE,0);
+            *sumlen += length%BLOCK_SIZE;
+                fwrite(buff,length%BLOCK_SIZE,1,f);
+            fclose(f);
+            return 0;
+        }
+    }
+}
 void showfdList(){
     int num=0;
     for(int i=0;i<MAX_FD_NUM;i++){

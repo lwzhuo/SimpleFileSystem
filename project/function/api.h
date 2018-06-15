@@ -19,6 +19,8 @@
     void my_close(int fd);
     int my_write(int fd,int *len,char wstyle);
     int my_read(int fd,int *len);
+    int my_in(int fd,char *filename,int *len);
+    int my_out(int fd,char *filename,int *len);
     char *getPwd();
     void exitsys();
 #endif

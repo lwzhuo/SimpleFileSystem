@@ -48,6 +48,8 @@ void help(){
     printf("%-10s - %s\n","pfcb","show current fcb");
     printf("%-10s - %s\n","sbc","show block chain");
     printf("%-10s - %s\n","sbd","show data in block");
+    printf("%-10s - %s\n","in","read file to disk from outer file");
+    printf("%-10s - %s\n","out","write file from disk to outer file");
 }
 int doOpration(int argc,char ** argv){
     //printf("%d **%s**\n",argc,argv[0]);
@@ -324,6 +326,51 @@ int doOpration(int argc,char ** argv){
                 return -1;
             }
             showBlockData(a);
+            return 0;
+        }  
+    }
+
+    if(strcmp(argv[0],"in")==0){
+        if(argc!=3){
+            printf("usage %s [fd] [outer filename]\n",argv[0]);
+            return -1;
+        }
+        else{
+            int a1,len=0;
+            char *a2;
+            //printf("a1%s a2%s\n",argv[1],argv[2]);
+            a1 = atoi(argv[1]);
+            a2 = argv[2];
+            if((strcmp(argv[1],"0")&&a1==0)){
+                printf("usage %s [fd] [outer filename]\n",argv[0]);
+                return -1;
+            }
+            if(strlen(argv[1])!=1){
+                printf("usage %s [fd] [write method]\n",argv[0]);
+                return -1;
+            }
+            if(my_in(a1,a2,&len)==0){
+                printf("succeed write to fd %d with %d bytes\n",a1,len);
+                return 0;
+            }
+            return 0;
+        }  
+    }
+
+    if(strcmp(argv[0],"out")==0){
+        if(argc!=3){
+            printf("usage %s [fd num] [outer filename]\n",argv[0]);
+            return -1;
+        }
+        else{
+            int a,len=0;
+            a = atoi(argv[1]);
+            if(strcmp(argv[1],"0")&&a==0){
+                printf("usage %s [fd num] [outer filename]\n",argv[0]);
+                return -1;
+            }
+            if(my_out(a,argv[2],&len)==0)
+                printf("read fd %d with %d bytes\n",a,len);
             return 0;
         }  
     }
