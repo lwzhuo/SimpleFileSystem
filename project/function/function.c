@@ -31,8 +31,8 @@ void format(){//文件系统格式化
     strcpy(rootFCB.name,"/");
     rootFCB.type = 1;       //类型-目录
     rootFCB.use = USED;        //已使用
-    rootFCB.time = gettime(t);
-    rootFCB.date = getdate(t);
+    rootFCB.time = getTime(t);
+    rootFCB.date = getDate(t);
     rootFCB.base = 6;       //起始盘块号
     rootFCB.length = 1;     //长度
     FAT1[5].item=FCB_BLOCK;
@@ -121,17 +121,25 @@ int showFAT(int start,int end){
 void showFCB(int blocknum,int num_in_block){
     FCB fcb;
     readFromDisk(DISK,&fcb,sizeof(fcb),blocknum*BLOCK_SIZE,num_in_block*FCB_SIZE);
+    unsigned short time = fcb.time;
+    unsigned short date = fcb.date;
     printf("*****block %d offset %d*****\n",blocknum,num_in_block);
-    printf("name %s\ntype %d\nused %d\ncreate time %d\n\
-create date %d\nblocknum %d\nlength %d\n",
-fcb.name,fcb.type,fcb.use,fcb.time,fcb.date,fcb.base,fcb.length);
+    printf("name %s\ntype %d\nused %d\ncreate time %02d:%02d:%02d\n\
+create date %4d/%02d/%02d\nblocknum %d\nlength %d\n",
+fcb.name,fcb.type,fcb.use,
+getHour(date,time),getMinute(time),getSecond(time),
+getYear(date),getMonth(date),getDay(date),fcb.base,fcb.length);
 }
 
 void showPresentFCB(){
-    printf("name %s\ntype %d\nused %d\ncreate time %d\n\
-create date %d\nblocknum %d\nlength %d\n",
+    unsigned short time = presentFCB.time;
+    unsigned short date = presentFCB.date;
+    printf("name %s\ntype %d\nused %d\ncreate time %02d:%02d:%02d\n\
+create date %4d/%02d/%02d\nblocknum %d\nlength %d\n",
 presentFCB.name,presentFCB.type,presentFCB.use,
-presentFCB.time,presentFCB.date,presentFCB.base,presentFCB.length);
+getHour(date,time),getMinute(time),getSecond(time),
+getYear(date),getMonth(date),getDay(date),
+presentFCB.base,presentFCB.length);
 }
 
 void showBlockData(int blocknum){
@@ -191,8 +199,8 @@ int my_mkdir(char *dirname){
     strcpy(fcb.name,dirname);
     fcb.type=1;
     fcb.use=USED;
-    fcb.time=gettime(t);
-    fcb.date=getdate(t);
+    fcb.time=getTime(t);
+    fcb.date=getDate(t);
     fcb.base=blocknum;
     fcb.length=1;
     initFCBBlock(blocknum,presentFCB.base);
@@ -246,15 +254,18 @@ void my_ls(){
     lslink *FCBlisthead,*temp;
     FCBList FL,*Fnode;
     FCBlisthead = &(FL.link);
-
+    unsigned short date;
+    unsigned short time;
     printf("directory %s\n",pwd);
-    printf("%-12s %-10s %-8s %-6s\n","name","type","time","length(bytes)");
+    printf("%-12s %-10s %-20s %-6s\n","name","type","time","length(bytes)");
     getFCBList(blocknum,FL,FCBlisthead);
     list_for_each(temp,FCBlisthead){
         Fnode = list_entry(temp,FCBList,link);
-        printf("%-12s %-10s %4d%4d %-6d\n",Fnode->fcb_entry.name,
-        type[Fnode->fcb_entry.type],Fnode->fcb_entry.date,Fnode->fcb_entry.time,
-        Fnode->fcb_entry.length);
+        date = Fnode->fcb_entry.date;
+        time = Fnode->fcb_entry.time;
+        printf("%-12s %-10s %4d/%02d/%02d %02d:%02d:%02d  %-6d\n",Fnode->fcb_entry.name,
+        type[Fnode->fcb_entry.type],getYear(date),getMonth(date),getDay(date),
+        getHour(date,time),getMinute(time),getSecond(time),Fnode->fcb_entry.length);
     }
 }
 
@@ -319,8 +330,8 @@ int my_create(char *filename){
                 strcpy(fcb.name,filename);
                 fcb.type=0;
                 fcb.use=USED;
-                fcb.time=gettime(t);
-                fcb.date=getdate(t);
+                fcb.time=getTime(t);
+                fcb.date=getDate(t);
                 fcb.base=blocknum;
                 fcb.length=1;
                 addFCB(fcb,presentFCB.base);

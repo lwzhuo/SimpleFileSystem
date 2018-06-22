@@ -62,8 +62,8 @@ int initFCBBlock(int blocknum,int parentblocknum){
     strcpy(fcb.name,".");
     fcb.type=1;
     fcb.use=USED;
-    fcb.time=gettime(t);
-    fcb.date=getdate(t);
+    fcb.time=getTime(t);
+    fcb.date=getDate(t);
     fcb.base=blocknum;//指向当前目录
     fcb.length=1;
     addFCB(fcb,blocknum);
@@ -71,8 +71,8 @@ int initFCBBlock(int blocknum,int parentblocknum){
     strcpy(fcb.name,"..");
     fcb.type=1;
     fcb.use=USED;
-    fcb.time=gettime(t);
-    fcb.date=getdate(t);
+    fcb.time=getTime(t);
+    fcb.date=getDate(t);
     fcb.base=parentblocknum;//指向父目录
     fcb.length=1;
     addFCB(fcb,blocknum);
