@@ -4,6 +4,7 @@ project/mydisk
 test/*
 !test/*.c
 !test/*.h
+testfile
 .vscode
 
 # Prerequisites

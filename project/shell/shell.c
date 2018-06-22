@@ -4,6 +4,7 @@
 #include"shell.h"
 #include"../global/global.h"
 #include"../util/str.h"
+#include"../util/time.h"
 #include"../function/api.h"
 char * header(){
     char *buff;
@@ -50,6 +51,7 @@ void help(){
     printf("%-10s - %s\n","sbd","show data in block");
     printf("%-10s - %s\n","in","read file to disk from outer file");
     printf("%-10s - %s\n","out","write file from disk to outer file");
+    printf("%-10s - %s\n","time","show current time");
 }
 int doOpration(int argc,char ** argv){
     //printf("%d **%s**\n",argc,argv[0]);
@@ -371,6 +373,17 @@ int doOpration(int argc,char ** argv){
             }
             if(my_out(a,argv[2],&len)==0)
                 printf("read fd %d with %d bytes\n",a,len);
+            return 0;
+        }  
+    }
+
+    if(strcmp(argv[0],"time")==0){
+        if(argc>1){
+            printf("%s : too many arguments\n",argv[0]);
+            return -1;
+        }
+        else{
+            showCurrentTime();
             return 0;
         }  
     }

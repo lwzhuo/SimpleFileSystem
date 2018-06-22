@@ -8,3 +8,4 @@ unsigned short getSecond(unsigned short time);
 unsigned short getYear(unsigned short time);
 unsigned short getMonth(unsigned short time);
 unsigned short getDay(unsigned short time);
+void showCurrentTime();

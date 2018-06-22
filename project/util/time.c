@@ -54,3 +54,12 @@ unsigned short getDay(unsigned short time){
     time = time & 32767;
     return (time%372)%31;//372=12*31
 }
+
+void showCurrentTime(){
+    struct tm* ts = getTimeStruct();
+    unsigned short date = getDate(ts);
+    unsigned short time = getTime(ts);
+    printf("%4d/%02d/%02d %02d:%02d:%02d\n",
+    getYear(date),getMonth(date),getDay(date),
+    getHour(date,time),getMinute(time),getSecond(time));
+}
