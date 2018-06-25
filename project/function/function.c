@@ -784,7 +784,7 @@ void showfdList(){
     for(int i=0;i<MAX_FD_NUM;i++){
         if(uopenlist[i].topenfile==USED){
             num++;
-            printf("%-2d fd:%d name:%s dir:%s fileptr:%d block:%d offset:%d\n",num,i,
+            printf("%-2d fd:%d name:%s dir:%s fileptr:%d [FCB in block:%d FCB offset:%d]\n",num,i,
             uopenlist[i].fcb.name,uopenlist[i].dir,uopenlist[i].count,
             uopenlist[i].blocknum,uopenlist[i].offset_in_block);
         }
