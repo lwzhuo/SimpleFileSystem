@@ -1447,7 +1447,7 @@ int doOpration(int argc, char **argv)
         }
     }
 
-    if (strcmp(argv[0], "create") == 0)
+    if (strcmp(argv[0], "touch") == 0)
     {
         if (argc != 2)
         {
