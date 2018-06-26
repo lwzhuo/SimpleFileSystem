@@ -1,3 +1,7 @@
+/**************************************************/
+/*                     已废弃                      */
+/*                   无法正常使用                  */
+/**************************************************/ 
 #include<stdlib.h>
 typedef struct list_head list_head;
 typedef struct list_head{
