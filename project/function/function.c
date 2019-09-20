@@ -13,9 +13,9 @@ void format(){//文件系统格式化
 //引导块 BLOCK0
     strcpy(block0.identify,"MYDISK");
     strcpy(block0.info,"blocksize:1024B\nblocknum:1024 Disksize:1MB");
-    block0.root = 5;
-    block0.startblock = 6;
-    block0.rootFCB = 6;
+    block0.root = ROOT_FCB_LOCATION;
+    block0.startblock = DATA_INIT_BLOCK;
+    block0.rootFCB = ROOT_FCB_LOCATION;
     fseek(DISK,0,SEEK_SET);
     fwrite(&block0,sizeof(BLOCK0),1,DISK);
 //两个FAT块 每个占2个磁盘块 每个FAT表项2B大小
