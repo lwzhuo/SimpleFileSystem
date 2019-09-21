@@ -42,3 +42,14 @@ char * trim(char *str){
     *(temp+1)='\0';
     return str+start;
 }
+
+int is_empty(char * str){
+    int empty = 1;
+    int not_empty = 0;
+    if(str==NULL)//字符串为null直接判定为空
+        return empty;
+    for(int i=0;i<strlen(str);i++)
+        if(!isspace(str[i]))//使用isspace判定是否有非空字符，如果有立刻判定字符串非空
+            return not_empty;
+    return empty;
+}
