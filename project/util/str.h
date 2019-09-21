@@ -3,4 +3,5 @@
 char ** split(char *string,char * delimiters,int *num);
 char * trim(char *str);
 int doOpration(int argc,char ** argv);
+int is_empty(char * str);
 #endif

@@ -23,7 +23,8 @@ char ** getInstruction(int *argc){
     fgets(buff,100,stdin);
     buff[strlen(buff)-1]='\0';
     buff = trim(buff);
-    Ins = split(buff," ",argc);
+    if(!is_empty(buff))//判断是否为空字符串
+        Ins = split(buff," ",argc);
     return Ins;
 }
 void help(){
@@ -55,6 +56,9 @@ void help(){
 }
 int doOpration(int argc,char ** argv){
     //printf("%d **%s**\n",argc,argv[0]);
+    if(is_empty(argv[0])) //如果输入为空行 则直接返回 进行下一条指令
+        return 0;
+
     if(strcmp(argv[0],"help")==0){
         if(argc>1){
             printf("%s : too many arguments\n",argv[0]);
